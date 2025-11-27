@@ -19,6 +19,8 @@ import MetricCard from './components/ui/MetricCard'
 import { activityPills, deepBlue, highlight, incomeSlices, metrics, portalKeys, portalMeta, salaryStacked, todoItems } from './data/portalData'
 import { useAuth } from './context/AuthContext'
 import SectionPage from './pages/SectionPage'
+import ChatPage from './pages/ChatPage'
+import AskHRPage from './pages/AskHRPage'
 
 function App() {
   return (
@@ -40,6 +42,22 @@ function App() {
           element={
             <PrivateRoute>
               <SectionPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/portal/:portalId/chat"
+          element={
+            <PrivateRoute>
+              <ChatPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/portal/:portalId/ask"
+          element={
+            <PrivateRoute>
+              <AskHRPage />
             </PrivateRoute>
           }
         />

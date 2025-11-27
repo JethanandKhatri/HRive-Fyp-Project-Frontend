@@ -85,6 +85,7 @@ export const todoItems = ['New Employee intro', 'Schedule product demo', 'Approv
 export const navByPortal = {
   hr: [
     { label: 'HR Dashboard', path: '' },
+    { label: 'Chat HR', path: 'chat' },
     { label: 'Holidays', path: 'holidays' },
     { label: 'Events', path: 'events' },
     { label: 'Activities', path: 'activities' },
@@ -103,6 +104,8 @@ export const navByPortal = {
   ],
   manager: [
     { label: 'Manager Dashboard', path: '' },
+    { label: 'Chat HR', path: 'chat' },
+    { label: 'Ask HR Bot', path: 'ask' },
     { label: 'Projects', path: 'projects' },
     { label: 'Squads', path: 'squads' },
     { label: 'Risks', path: 'risks' },
@@ -110,6 +113,8 @@ export const navByPortal = {
   ],
   employee: [
     { label: 'My Dashboard', path: '' },
+    { label: 'Chat HR', path: 'chat' },
+    { label: 'Ask HR Bot', path: 'ask' },
     { label: 'Tasks', path: 'tasks' },
     { label: 'Approvals', path: 'approvals' },
     { label: 'Payslips', path: 'payslips' },

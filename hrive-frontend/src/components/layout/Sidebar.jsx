@@ -17,7 +17,7 @@ function Sidebar({ portal }) {
           <p className="user-role">{portalMeta[portal]?.description ?? ''}</p>
         </div>
       </div>
-      <div className="sidenav">
+      <div className="sidenav desktop-only">
         <div className="sidenav-section">
           <p className="sidenav-title">{portalMeta[portal]?.label ?? 'Portal'}</p>
           {items.map((item, idx) =>
