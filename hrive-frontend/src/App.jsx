@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { BrowserRouter, Navigate, NavLink, Route, Routes, useNavigate, useParams } from 'react-router-dom'
+import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import {
   Bar,
   BarChart,
@@ -21,6 +21,7 @@ import { useAuth } from './context/AuthContext'
 import SectionPage from './pages/SectionPage'
 import ChatPage from './pages/ChatPage'
 import AskHRPage from './pages/AskHRPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route
           path="/portal/:portalId"
           element={
@@ -74,7 +75,7 @@ function PrivateRoute({ children }) {
 }
 
 function LoginPage() {
-  const { login, isAuthed, role } = useAuth()
+  const { login } = useAuth()
   const navigate = useNavigate()
   const [error, setError] = useState('')
 
@@ -109,77 +110,17 @@ function LoginPage() {
           </label>
           <label>
             Password
-            <input name="password" type="password" placeholder="••••••••" required />
+            <input name="password" type="password" placeholder="********" required />
           </label>
           <button type="submit" className="primary">
             Continue
           </button>
+          <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+            <Link to="/forgot-password" style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+              Forgot Password?
+            </Link>
+          </div>
           {error ? <p className="muted small">{error}</p> : null}
-          <p className="muted small">
-            New here? <NavLink to="/signup">Create an account</NavLink>
-          </p>
-        </form>
-      </div>
-    </div>
-  )
-}
-
-function SignupPage() {
-  const { signup, isAuthed, role } = useAuth()
-  const navigate = useNavigate()
-
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    const data = new FormData(event.target)
-    const name = data.get('name')
-    const email = data.get('email')
-    const password = data.get('password')
-    const portal = data.get('portal')
-    const result = await signup(name, email, password, portal)
-    if (result.ok) navigate(`/portal/${result.role || portal}`)
-  }
-
-  if (isAuthed && role) return <Navigate to={`/portal/${role}`} replace />
-
-  return (
-    <div className="auth-page">
-      <div className="auth-card glass">
-        <div className="auth-hero">
-          <p className="tag">Join HRive</p>
-          <h1>Create your workspace access</h1>
-          <p className="muted">
-            Sign up with your company email and pick the portal you need. You can switch later if you have permissions.
-          </p>
-        </div>
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <label>
-            Full name
-            <input name="name" type="text" placeholder="Jessica Doe" required />
-          </label>
-          <label>
-            Email
-            <input name="email" type="email" placeholder="you@company.com" required />
-          </label>
-          <label>
-            Password
-            <input name="password" type="password" placeholder="••••••••" required />
-          </label>
-          <label>
-            Choose portal
-            <select name="portal" defaultValue="employee">
-              {portalKeys.map((p) => (
-                <option key={p} value={p}>
-                  {portalMeta[p].label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button type="submit" className="primary">
-            Create account
-          </button>
-          <p className="muted small">
-            Already have an account? <NavLink to="/login">Login</NavLink>
-          </p>
         </form>
       </div>
     </div>

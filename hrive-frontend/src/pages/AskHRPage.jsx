@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 
 function AskHRPage() {
   const { portalId } = useParams()
-  const { role, logout, email, apiUrl } = useAuth()
+  const { role, logout, email } = useAuth()
   const navigate = useNavigate()
   const [messages, setMessages] = useState([
     { from: 'HR Bot', text: 'Hi! Ask me about salary, leave balance, payroll dates, benefits, or your manager.' },
@@ -34,20 +34,17 @@ function AskHRPage() {
     setInput('')
     setLoading(true)
     setError('')
-    fetch(`${apiUrl}/api/ask-hr`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user: email, question }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setMessages((prev) => [...prev, { from: 'HR Bot', text: data?.answer || 'Logged for HR.' }])
-        setLoading(false)
-      })
-      .catch(() => {
-        setError('Could not reach HR bot')
-        setLoading(false)
-      })
+    // Simple local mock answers while backend is disconnected
+    const lowerQ = question.toLowerCase()
+    let answer = 'Got it, I will log this for HR.'
+    if (lowerQ.includes('salary') || lowerQ.includes('pay')) answer = 'Salaries are processed on the 28th each month.'
+    else if (lowerQ.includes('leave')) answer = 'You have 14 annual leaves and 6 sick leaves remaining.'
+    else if (lowerQ.includes('benefit') || lowerQ.includes('insurance')) answer = 'Health insurance is covered via HMO Plus. Dental is included.'
+    else if (lowerQ.includes('manager')) answer = 'Your manager is listed as: manager@hrive.com.'
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { from: 'HR Bot', text: answer }])
+      setLoading(false)
+    }, 400)
   }
 
   useEffect(() => {

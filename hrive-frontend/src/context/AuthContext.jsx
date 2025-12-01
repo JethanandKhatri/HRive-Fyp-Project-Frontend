@@ -1,86 +1,116 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
 const AuthContext = createContext(null)
+
+const SUPABASE_FUNCTIONS_BASE = '/functions/v1'
 
 export function AuthProvider({ children }) {
   const [role, setRole] = useState(null)
-  const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-  const deriveRole = (emailInput) => {
-    const lower = (emailInput || '').toLowerCase()
-    if (lower.startsWith('admin')) return 'admin'
-    if (lower.includes('hr')) return 'hr'
-    if (lower.includes('manager')) return 'manager'
-    return 'employee'
-  }
-
+  // App load par localStorage se state restore karo
   useEffect(() => {
-    const savedRole = localStorage.getItem('hrive_role')
+    const token = localStorage.getItem('hrive_access_token')
     const savedEmail = localStorage.getItem('hrive_email')
-    if (savedRole) setRole(savedRole)
-    if (savedEmail) setEmail(savedEmail)
+    const savedRole = localStorage.getItem('hrive_role')
+
+    if (token && savedEmail && savedRole) {
+      setEmail(savedEmail)
+      setRole(savedRole)
+    }
     setLoading(false)
   }, [])
 
   const login = async (emailInput, password) => {
-    if (!emailInput || !password) return { ok: false, error: 'Email and password required' }
-    let data
+    if (!emailInput || !password) {
+      return { ok: false, error: 'Email and password required' }
+    }
+
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_BASE}/login`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          // Edge Functions require the Anon Key for authorization
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
         body: JSON.stringify({ email: emailInput, password }),
       })
-      data = await res.json().catch(() => ({}))
-      if (!res.ok) return { ok: false, error: data?.error || 'Login failed' }
-      setRole(data.role)
-      setEmail(data.email)
-      localStorage.setItem('hrive_role', data.role)
-      localStorage.setItem('hrive_email', data.email)
-      return { ok: true, role: data.role }
-    } catch (err) {
-      const fallbackRole = deriveRole(emailInput)
-      setRole(fallbackRole)
-      setEmail(emailInput)
-      localStorage.setItem('hrive_role', fallbackRole)
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { ok: false, error: data.error || 'Login failed' }
+      }
+
+      // yahan se tumhara edge func ka structure use karo
+      const accessToken = data.session?.access_token
+      const refreshToken = data.session?.refresh_token
+      const rawRole = data.user?.role // "ADMIN" | "HR" | ...
+      const backendRole = rawRole ? rawRole.toLowerCase() : null
+
+      if (!accessToken || !backendRole) {
+        return { ok: false, error: 'Invalid login response from server' }
+      }
+
+      // tokens + user info localStorage me save karo
+      localStorage.setItem('hrive_access_token', accessToken)
+      if (refreshToken) {
+        localStorage.setItem('hrive_refresh_token', refreshToken)
+      }
       localStorage.setItem('hrive_email', emailInput)
-      return { ok: true, role: fallbackRole, fallback: true }
+      localStorage.setItem('hrive_role', backendRole)
+
+      setEmail(emailInput)
+      setRole(backendRole)
+
+      return { ok: true, role: backendRole }
+    } catch (err) {
+      console.error('Login error:', err)
+      return { ok: false, error: 'Network error or server unavailable' }
     }
   }
 
-  const signup = async (name, emailInput, password, nextRole) => {
-    if (!emailInput || !password) return { ok: false, error: 'Email and password required' }
-    let data
+  const forgotPassword = async (emailInput) => {
+    if (!emailInput) return { ok: false, error: 'Email required' }
+    
     try {
-      const res = await fetch(`${API_URL}/api/auth/signup`, {
+      const response = await fetch(`${SUPABASE_FUNCTIONS_BASE}/forget-password`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email: emailInput, password, role: nextRole }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ email: emailInput }),
       })
-      data = await res.json().catch(() => ({}))
-      if (!res.ok) return { ok: false, error: data?.error || 'Signup failed' }
-      setRole(data.role)
-      setEmail(data.email)
-      localStorage.setItem('hrive_role', data.role)
-      localStorage.setItem('hrive_email', data.email)
-      return { ok: true, role: data.role }
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        return { ok: false, error: data.error || data.message || 'Failed to send reset link' }
+      }
+
+      return { ok: true }
     } catch (err) {
-      const fallbackRole = nextRole || deriveRole(emailInput)
-      setRole(fallbackRole)
-      setEmail(emailInput)
-      localStorage.setItem('hrive_role', fallbackRole)
-      localStorage.setItem('hrive_email', emailInput)
-      return { ok: true, role: fallbackRole, fallback: true }
+      console.error('Forgot Password error:', err)
+      return { ok: false, error: 'Network error or server unavailable' }
     }
   }
 
   const logout = () => {
+    localStorage.removeItem('hrive_access_token')
+    localStorage.removeItem('hrive_refresh_token')
+    localStorage.removeItem('hrive_email')
+    localStorage.removeItem('hrive_role')
     setRole(null)
     setEmail(null)
-    localStorage.removeItem('hrive_role')
-    localStorage.removeItem('hrive_email')
   }
 
   const value = useMemo(
@@ -89,10 +119,12 @@ export function AuthProvider({ children }) {
       email,
       loading,
       login,
-      signup,
       logout,
-      isAuthed: Boolean(role || email),
-      apiUrl: API_URL,
+      forgotPassword,
+      isAuthed: Boolean(role),
+      isAdmin: role === 'ADMIN',
+      isHR: role === 'HR',
+      isManager: role === 'MANAGER',
     }),
     [role, email, loading],
   )

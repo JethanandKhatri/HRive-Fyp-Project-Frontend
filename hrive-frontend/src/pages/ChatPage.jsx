@@ -1,30 +1,32 @@
-import React from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
-import DashboardShell from '../components/layout/DashboardShell'
-import ChatWidget from '../components/ui/ChatWidget'
-import { portalKeys, portalMeta } from '../data/portalData'
-import { useAuth } from '../context/AuthContext'
+import React from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+import DashboardShell from "../components/layout/DashboardShell";
+import ChatWidget from "../components/ui/ChatWidget";
+import { portalKeys, portalMeta } from "../data/portalData";
+import { useAuth } from "../context/AuthContext";
 
 function ChatPage() {
-  const { portalId } = useParams()
-  const { role, logout } = useAuth()
-  const navigate = useNavigate()
+  const { portalId } = useParams();
+  const { role, logout } = useAuth();
+  const navigate = useNavigate();
   const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
+    logout();
+    navigate("/login");
+  };
 
   if (!portalId || !portalKeys.includes(portalId)) {
-    return <Navigate to={`/portal/${role || 'hr'}`} replace />
+    return <Navigate to={`/portal/${role || "hr"}`} replace />;
   }
 
-  const title = 'Chat with HR'
-  const subtitle = 'Direct line to HR for requests, updates, and follow-ups.'
+  const title = "Chat with HR";
+  const subtitle = "Direct line to HR for requests, updates, and follow-ups.";
 
   return (
     <DashboardShell portal={portalId} onLogout={handleLogout}>
       <div className="portal-tabs">
-        <span className="portal-tab active">{portalMeta[portalId]?.label} Portal</span>
+        <span className="portal-tab active">
+          {portalMeta[portalId]?.label} Portal
+        </span>
       </div>
       <div className="hero-banner">
         <div>
@@ -45,7 +47,10 @@ function ChatPage() {
             <div>
               <p className="tag">Conversation</p>
               <h3>Messages with HR</h3>
-              <p className="muted small">Use this channel to ask HR about leave, payroll, onboarding, or policies.</p>
+              <p className="muted small">
+                Use this channel to ask HR about leave, payroll, onboarding, or
+                policies.
+              </p>
             </div>
             <div className="pill-row">
               <span className="pill soft">Private</span>
@@ -56,7 +61,7 @@ function ChatPage() {
         </div>
       </div>
     </DashboardShell>
-  )
+  );
 }
 
-export default ChatPage
+export default ChatPage;

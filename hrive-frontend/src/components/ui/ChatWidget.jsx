@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
 function ChatWidget({ portal }) {
-  const { email, apiUrl, role } = useAuth()
+  const { email, role } = useAuth()
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
@@ -25,25 +25,15 @@ function ChatWidget({ portal }) {
       setLoading(false)
       return
     }
-    let active = true
     setLoading(true)
     setError('')
-    fetch(`${apiUrl}/api/chat/history?userA=${encodeURIComponent(senderEmail)}&userB=${encodeURIComponent(counterpart)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!active) return
-        setMessages(data?.messages || [])
-        setLoading(false)
-      })
-      .catch(() => {
-        if (!active) return
-        setError('Unable to load chat')
-        setLoading(false)
-      })
-    return () => {
-      active = false
-    }
-  }, [apiUrl, senderEmail, counterpart, canChat, portal, role])
+    const mockHistory = [
+      { id: 1, sender: counterpart, body: 'Hi there! How can I help today?' },
+      { id: 2, sender: senderEmail, body: 'Just testing chat without backend.' },
+    ]
+    setMessages(mockHistory)
+    setLoading(false)
+  }, [senderEmail, counterpart, canChat, portal, role])
 
   useEffect(() => {
     if (!isHR) {
@@ -51,42 +41,21 @@ function ChatWidget({ portal }) {
       setTarget(hrContacts[0])
       return
     }
-    let active = true
-    fetch(`${apiUrl}/api/chat/contacts?user=${encodeURIComponent(senderEmail)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!active) return
-        const list = data?.contacts || []
-        setContacts(list)
-        if (list.length && !list.includes(target)) {
-          setTarget(list[0])
-        }
-      })
-      .catch(() => {
-        if (!active) return
-        setContacts([])
-      })
-    return () => {
-      active = false
+    const mockContacts = ['employee@hrive.com', 'manager@hrive.com', 'teamlead@hrive.com']
+    setContacts(mockContacts)
+    if (mockContacts.length && !mockContacts.includes(target)) {
+      setTarget(mockContacts[0])
     }
-  }, [apiUrl, isHR, senderEmail])
+  }, [isHR, senderEmail, target])
 
   const sendMessage = () => {
     if (!canChat || !input.trim()) return
     const body = input.trim()
     setInput('')
-    fetch(`${apiUrl}/api/chat/send`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sender: senderEmail, recipient: counterpart, body }),
-    })
-      .then((res) => res.json())
-      .then((msg) => {
-        setMessages((prev) => [...prev, msg])
-      })
-      .catch(() => {
-        setError('Failed to send')
-      })
+    setError('')
+    const outgoing = { id: Date.now(), sender: senderEmail, body }
+    const reply = { id: Date.now() + 1, sender: counterpart, body: 'Noted. Backend connection is offline, using mock chat.' }
+    setMessages((prev) => [...prev, outgoing, reply])
   }
 
   return (

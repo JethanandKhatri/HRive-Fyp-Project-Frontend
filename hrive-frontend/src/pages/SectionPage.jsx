@@ -5,8 +5,6 @@ import ChartCard from '../components/ui/ChartCard'
 import { navByPortal, portalKeys, portalMeta } from '../data/portalData'
 import { useAuth } from '../context/AuthContext'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000'
-
 function SectionPage() {
   const { portalId, section } = useParams()
   const { role, logout } = useAuth()
@@ -27,27 +25,11 @@ function SectionPage() {
   }
 
   useEffect(() => {
-    let active = true
     setLoading(true)
     setError('')
-    fetch(`${API_URL}/api/portal/${portalId}/${section}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load section')
-        return res.json()
-      })
-      .then((data) => {
-        if (!active) return
-        setItems(data.items || [])
-        setLoading(false)
-      })
-      .catch((err) => {
-        if (!active) return
-        setError(err.message || 'Error')
-        setLoading(false)
-      })
-    return () => {
-      active = false
-    }
+    const mockItems = ['Item A', 'Item B', 'Item C']
+    setItems(mockItems)
+    setLoading(false)
   }, [portalId, section])
 
   const title = (navByPortal[portalId] || []).find((n) => n.path === section)?.label || section
@@ -61,11 +43,11 @@ function SectionPage() {
         <div>
           <p className="tag">{portalMeta[portalId]?.label} / {title}</p>
           <h2>{title}</h2>
-          <p className="muted">This is a placeholder page backed by the mock API.</p>
+          <p className="muted">This page currently shows local mock data (no backend connected).</p>
         </div>
       </div>
       <div className="content-grid">
-        <ChartCard title={title} subtitle="Loaded from backend">
+        <ChartCard title={title} subtitle="Loaded locally (mock data)">
           {loading ? (
             <p className="muted">Loading...</p>
           ) : error ? (

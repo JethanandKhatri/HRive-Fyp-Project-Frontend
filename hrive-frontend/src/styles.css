@@ -276,8 +276,11 @@ a {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: #fff;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   cursor: pointer;
   padding: 8px;
 }
@@ -287,7 +290,6 @@ a {
   height: 2px;
   background: #222;
   display: block;
-  margin: 3px 0;
   border-radius: 2px;
 }
 
@@ -1040,10 +1042,5 @@ a {
 
   .desktop-only {
     display: none;
-  }
-
-  .mobile-drawer,
-  .mobile-drawer-backdrop {
-    display: block;
   }
 }
