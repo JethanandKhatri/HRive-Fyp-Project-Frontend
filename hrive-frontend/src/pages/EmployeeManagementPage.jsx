@@ -4,8 +4,8 @@ import ChartCard from '../components/ui/ChartCard'
 import { useAuth } from '../context/AuthContext'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { portalMeta } from '../data/portalData'
+import { SUPABASE_FUNCTIONS_BASE } from '../lib/supabaseClient'
 
-const SUPABASE_FUNCTIONS_BASE = '/functions/v1'
 // Backend handles GET/POST/PUT on the same function (create-employee)
 const EMPLOYEE_ENDPOINT = `${SUPABASE_FUNCTIONS_BASE}/create-employee`
 

@@ -5,11 +5,9 @@ import React, {
   useMemo,
   useState,
 } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { SUPABASE_FUNCTIONS_BASE, supabase } from '../lib/supabaseClient'
 
 const AuthContext = createContext(null)
-
-const SUPABASE_FUNCTIONS_BASE = '/functions/v1'
 
 export function AuthProvider({ children }) {
   const [role, setRole] = useState(null)

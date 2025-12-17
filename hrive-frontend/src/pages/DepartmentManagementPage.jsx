@@ -3,8 +3,7 @@ import DashboardShell from '../components/layout/DashboardShell'
 import ChartCard from '../components/ui/ChartCard'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-
-const SUPABASE_FUNCTIONS_BASE = '/functions/v1'
+import { SUPABASE_FUNCTIONS_BASE } from '../lib/supabaseClient'
 
 function DepartmentManagementPage() {
   const { role, logout } = useAuth()
@@ -426,5 +425,4 @@ function DepartmentManagementPage() {
 }
 
 export default DepartmentManagementPage
-
 

@@ -4,8 +4,7 @@ import ChartCard from '../components/ui/ChartCard'
 import { portalMeta } from '../data/portalData'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-
-const SUPABASE_FUNCTIONS_BASE = '/functions/v1'
+import { SUPABASE_FUNCTIONS_BASE } from '../lib/supabaseClient'
 
 function UserManagementPage() {
   const { role, logout } = useAuth()
