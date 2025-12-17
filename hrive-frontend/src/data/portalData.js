@@ -96,6 +96,9 @@ export const navByPortal = {
   ],
   admin: [
     { label: 'Admin Dashboard', path: '' },
+    { label: 'User Management', path: 'users' },
+    { label: 'Employees', path: 'employees' },
+    { label: 'Departments', path: 'departments' },
     { label: 'Systems', path: 'systems' },
     { label: 'Policies', path: 'policies' },
     { label: 'Audit', path: 'audit' },

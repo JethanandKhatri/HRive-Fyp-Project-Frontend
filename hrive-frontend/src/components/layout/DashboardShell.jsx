@@ -5,7 +5,7 @@ import Topbar from './Topbar'
 function DashboardShell({ portal, onLogout, children }) {
   return (
     <div className="page">
-      <Sidebar portal={portal} />
+      <Sidebar portal={portal} onLogout={onLogout} />
       <main className="page-content">
         <Topbar portal={portal} onLogout={onLogout} />
         {children}

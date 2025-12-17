@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
 const AuthContext = createContext(null)
 
@@ -17,6 +18,7 @@ export function AuthProvider({ children }) {
 
   // App load par localStorage se state restore karo
   useEffect(() => {
+    // Initial load from local storage
     const token = localStorage.getItem('hrive_access_token')
     const savedEmail = localStorage.getItem('hrive_email')
     const savedRole = localStorage.getItem('hrive_role')
@@ -26,6 +28,24 @@ export function AuthProvider({ children }) {
       setRole(savedRole)
     }
     setLoading(false)
+
+    // Listen for auth changes (auto-refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN') {
+        console.log('Token refreshed/updated automatically by Supabase')
+        if (session) {
+           localStorage.setItem('hrive_access_token', session.access_token)
+           if(session.refresh_token) localStorage.setItem('hrive_refresh_token', session.refresh_token)
+        }
+      } 
+      if (event === 'SIGNED_OUT') {
+        clearLocalAuth()
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const login = async (emailInput, password) => {
@@ -54,7 +74,7 @@ export function AuthProvider({ children }) {
       const accessToken = data.session?.access_token
       const refreshToken = data.session?.refresh_token
       const rawRole = data.user?.role // "ADMIN" | "HR" | ...
-      const backendRole = rawRole ? rawRole.toLowerCase() : null
+      const backendRole = rawRole ? rawRole.toUpperCase() : null
 
       if (!accessToken || !backendRole) {
         return { ok: false, error: 'Invalid login response from server' }
@@ -67,6 +87,15 @@ export function AuthProvider({ children }) {
       }
       localStorage.setItem('hrive_email', emailInput)
       localStorage.setItem('hrive_role', backendRole)
+
+      // IMPORTANT: Hydrate Supabase Client so it handles auto-refresh
+      if (refreshToken) {
+         await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+         })
+         console.log('Supabase session set for auto-refresh')
+      }
 
       setEmail(emailInput)
       setRole(backendRole)
@@ -104,13 +133,22 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const logout = () => {
+  const clearLocalAuth = () => {
     localStorage.removeItem('hrive_access_token')
     localStorage.removeItem('hrive_refresh_token')
     localStorage.removeItem('hrive_email')
     localStorage.removeItem('hrive_role')
     setRole(null)
     setEmail(null)
+  }
+
+  const logout = async () => {
+    clearLocalAuth() // Optimistic update: Clear state immediately for responsiveness
+    try {
+      await supabase.auth.signOut()
+    } catch (error) {
+      console.error('Error signing out:', error)
+    }
   }
 
   const value = useMemo(

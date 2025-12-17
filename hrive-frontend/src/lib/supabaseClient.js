@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'YOUR_SUPABASE_URL'
-const supabaseAnonKey = 'YOUR_SUPABASE_ANON_KEY'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ruewgiljaznyllyqmrep.supabase.co'
+// Prevent crash if key is missing by using a placeholder. Auth will fail but app will load.
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'PLACEHOLDER_KEY_TO_PREVENT_CRASH'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)

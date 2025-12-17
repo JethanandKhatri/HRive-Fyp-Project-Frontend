@@ -2,13 +2,14 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { navByPortal, portalMeta } from '../../data/portalData'
 
-function Sidebar({ portal }) {
+function Sidebar({ portal, onLogout }) {
   const items = navByPortal[portal] ?? []
+  
   return (
     <aside className="sidebar">
       <div className="brand">
-        <div className="brand-mark">A</div>
-        <div className="brand-name">HRive</div>
+        <img src="/logo.jpg" alt="Logo" className="brand-logo" />
+        <div className="brand-name">Logo</div>
       </div>
       <div className="user-card">
         <div className="avatar">{portalMeta[portal]?.label?.[0] ?? '?'}</div>
@@ -33,6 +34,13 @@ function Sidebar({ portal }) {
           )}
         </div>
       </div>
+      {onLogout ? (
+        <div style={{ marginTop: 'auto' }}>
+           <button onClick={onLogout} className="logout desktop-only" style={{ width: '100%', justifyContent: 'center', marginTop: '20px' }}>
+              Logout
+           </button>
+        </div>
+      ) : null}
     </aside>
   )
 }

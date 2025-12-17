@@ -1,0 +1,192 @@
+import React, { useMemo } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import {
+  Bar,
+  BarChart,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import DashboardShell from '../components/layout/DashboardShell'
+import ChartCard from '../components/ui/ChartCard'
+import ChatWidget from '../components/ui/ChatWidget'
+import MetricCard from '../components/ui/MetricCard'
+import { useAuth } from '../context/AuthContext'
+import {
+  activityPills,
+  deepBlue,
+  highlight,
+  incomeSlices,
+  metrics,
+  portalKeys,
+  portalMeta,
+  salaryStacked,
+  todoItems,
+} from '../data/portalData'
+
+function DashboardPage() {
+  const { portalId } = useParams()
+  const { logout, role } = useAuth()
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
+  const portal = useMemo(() => {
+    // Normalize inputs to lowercase to avoid case-mismatch crashes
+    const pId = portalId ? portalId.toLowerCase() : null
+    const userRole = role ? role.toLowerCase() : 'hr'
+
+    if (pId && portalKeys.includes(pId)) {
+      return pId
+    }
+    return userRole
+  }, [portalId, role])
+
+  // Debugging logs
+  // console.log('DashboardPage Render:', { portalId, role, portal, meta: portalMeta[portal] })
+
+  if (role && portal !== role) {
+    if (portalId && portalKeys.includes(portalId.toLowerCase()) && role.toLowerCase() !== portalId.toLowerCase()) {
+        // Allow if we are viewing a specific portal we are allowed to see? relative to future RBAC
+        // For now, if mismatch and not just casing, redirect.
+        // Actually, existing logic forces redirect to role. Let's keep it but ensure casing doesn't trigger it.
+        if (portal !== role.toLowerCase()) {
+             // return <Navigate to={`/portal/${role.toLowerCase()}`} replace />
+        }
+    }
+  }
+  
+  // Defensive check: If portal key invalid, show error instead of crashing
+  if (!portalMeta[portal]) {
+      console.error('Invalid Portal Key:', portal)
+      return (
+          <DashboardShell portal={portal || 'hr'} onLogout={handleLogout}>
+              <div style={{padding: '2rem', color: 'red'}}>
+                  <h2>ErrorLoading Portal</h2>
+                  <p>Invalid portal configuration for key: <strong>{String(portal)}</strong></p>
+                  <button onClick={() => window.location.reload()}>Retry</button>
+              </div>
+          </DashboardShell>
+      )
+  }
+
+  const canChat = portal === 'hr' || portal === 'employee'
+
+  const stackData = salaryStacked[portal] ?? []
+  const barKeys = stackData.length ? Object.keys(stackData[0]).filter((k) => k !== 'month') : []
+  const barPalette = [deepBlue, '#f4c542', highlight]
+
+  return (
+    <DashboardShell portal={portal} onLogout={handleLogout}>
+      <div className="portal-tabs">
+        <span className="portal-tab active">{portalMeta[portal].label} Portal</span>
+      </div>
+
+      <div className="hero-banner">
+        <div>
+          <p className="tag">{portalMeta[portal].label} Portal</p>
+          <h2>{portalMeta[portal].greeting}</h2>
+          <p className="muted">{portalMeta[portal].description}</p>
+        </div>
+        <div className="hero-quick">
+          <span className="pill strong">Live</span>
+          <span className="pill soft">SLA 99.9%</span>
+          <span className="pill soft">Chatbot Active</span>
+        </div>
+      </div>
+
+      <div className="content-grid">
+        <div className="cards-grid">
+          {metrics[portal].map((metric) => (
+            <MetricCard key={metric.label} {...metric} />
+          ))}
+        </div>
+
+        <div className="chart-row">
+          <ChartCard title="Income Analysis" subtitle="8% higher than last month">
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie data={incomeSlices} dataKey="value" nameKey="name" innerRadius={45} outerRadius={85} paddingAngle={1}>
+                  {incomeSlices.map((slice) => (
+                    <Cell key={slice.name} fill={slice.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="legend-text">
+              {incomeSlices.map((slice) => (
+                <span key={slice.name}>
+                  <span className="dot" style={{ background: slice.color }} />
+                  {slice.name} {slice.value}%
+                </span>
+              ))}
+            </div>
+          </ChartCard>
+
+          <ChartCard title="Workload / Salary" subtitle="Stacks by month">
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={stackData} barSize={14}>
+                <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                <YAxis axisLine={false} tickLine={false} />
+                <Tooltip />
+                <Legend />
+                {barKeys.map((key, idx) => (
+                  <Bar key={key} dataKey={key} stackId="salary" fill={barPalette[idx % barPalette.length]} radius={[4, 4, 0, 0]} />
+                ))}
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="pill-row">
+              {activityPills.map((pill) => (
+                <button key={pill} className="pill">
+                  {pill}
+                </button>
+              ))}
+            </div>
+          </ChartCard>
+        </div>
+
+        <div className="bottom-grid">
+          <ChartCard title="Total Salary by Unit" compact>
+            <div className="unit-list">
+              {incomeSlices.map((slice) => (
+                <div key={slice.name} className="unit-row">
+                  <span className="unit-name">{slice.name}</span>
+                  <div className="unit-bar">
+                    <div className="unit-bar-fill" style={{ width: `${slice.value}%`, background: slice.color }} />
+                  </div>
+                  <span className="unit-value">{slice.value}%</span>
+                </div>
+              ))}
+            </div>
+          </ChartCard>
+
+          <ChartCard title="ToDo List" compact>
+            <ul className="todo-list">
+              {todoItems.map((item) => (
+                <li key={item}>
+                  <input type="checkbox" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </ChartCard>
+
+          <ChartCard title="Chatbot" subtitle={canChat ? 'HR & Employee assistant' : 'Available for HR/Employee'}>
+            <ChatWidget portal={portal} />
+          </ChartCard>
+        </div>
+      </div>
+    </DashboardShell>
+  )
+}
+
+export default DashboardPage

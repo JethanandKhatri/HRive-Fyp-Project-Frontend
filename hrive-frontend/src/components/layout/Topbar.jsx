@@ -26,7 +26,6 @@ function Topbar({ portal, onLogout }) {
           <span />
         </button>
         <div>
-          <p className="crumb">Lucid / Index</p>
           <h2 className="heading">{portalMeta[portal]?.label ?? 'Dashboard'}</h2>
         </div>
       </div>
