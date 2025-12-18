@@ -998,14 +998,14 @@ a {
   }
 
   .topbar {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr;
     gap: 8px;
     padding: 10px 12px;
-    align-items: stretch;
+    align-items: center;
   }
 
   .topbar-actions {
-    justify-content: flex-end;
+    display: none;
   }
 
   .auth-card {
