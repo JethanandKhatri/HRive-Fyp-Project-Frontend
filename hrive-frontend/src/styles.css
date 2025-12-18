@@ -317,7 +317,7 @@ a {
 }
 
 .mobile-only {
-  display: none;
+  display: none !important; /* hide on desktop */
 }
 
 .hamburger-btn {
@@ -996,7 +996,7 @@ a {
   }
 
   .mobile-only {
-    display: block;
+    display: inline-flex !important;
   }
 }
 
