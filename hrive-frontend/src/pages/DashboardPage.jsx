@@ -159,7 +159,12 @@ function DashboardPage() {
       </div>
 
       <div className="content-grid">
-        <div className="cards-grid">
+        <div className="cards-grid metric-grid">
+          {loadingStats ? (
+            <div className="spinner-overlay">
+              <div className="spinner" />
+            </div>
+          ) : null}
           {metricData.map((metric) => (
             <MetricCard key={metric.label} {...metric} />
           ))}
