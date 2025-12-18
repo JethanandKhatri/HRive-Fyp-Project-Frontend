@@ -772,6 +772,17 @@ a {
   background: #f7fafc;
 }
 
+.auth-error {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #fca5a5;
+  background: #fff1f2;
+  color: #b91c1c;
+  font-weight: 700;
+  text-align: center;
+}
+
 .chat-widget {
   display: flex;
   flex-direction: column;

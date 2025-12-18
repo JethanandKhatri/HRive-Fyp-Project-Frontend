@@ -104,7 +104,7 @@ function LoginPage() {
               Forgot Password?
             </Link>
           </div>
-          {error ? <p className="muted small">{error}</p> : null}
+          {error ? <div className="auth-error">{error}</div> : null}
         </form>
       </div>
     </div>
