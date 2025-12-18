@@ -13,13 +13,7 @@ function Sidebar({ portal, onLogout }) {
         <img src="/logo.jpg" alt="Logo" className="brand-logo" />
         <div className="brand-name">Logo</div>
       </div>
-      <div className="user-card">
-        <div className="avatar">{(displayName?.[0] || portalMeta[portal]?.label?.[0] || '?').toUpperCase()}</div>
-        <div>
-          <p className="user-name">{displayName || 'Welcome'}</p>
-          <p className="user-role">{portalMeta[portal]?.description ?? ''}</p>
-        </div>
-      </div>
+      {/* User card removed as requested */}
       <div className="sidenav desktop-only">
         <div className="sidenav-section">
           <p className="sidenav-title">{portalMeta[portal]?.label ?? 'Portal'}</p>
