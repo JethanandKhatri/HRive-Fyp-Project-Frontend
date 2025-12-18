@@ -548,23 +548,6 @@ a {
   font-size: 13px;
 }
 
-.dot-group {
-  display: flex;
-  gap: 6px;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--border);
-  display: inline-block;
-}
-
-.dot.filled {
-  background: var(--muted);
-}
-
 .legend-text {
   display: flex;
   gap: 12px;
