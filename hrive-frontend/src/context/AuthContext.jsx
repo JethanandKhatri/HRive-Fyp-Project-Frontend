@@ -12,6 +12,7 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [role, setRole] = useState(null)
   const [email, setEmail] = useState(null)
+  const [displayName, setDisplayName] = useState(null)
   const [loading, setLoading] = useState(true)
 
   // App load par localStorage se state restore karo
@@ -20,10 +21,12 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('hrive_access_token')
     const savedEmail = localStorage.getItem('hrive_email')
     const savedRole = localStorage.getItem('hrive_role')
+    const savedName = localStorage.getItem('hrive_name')
 
     if (token && savedEmail && savedRole) {
       setEmail(savedEmail)
       setRole(savedRole)
+      if (savedName) setDisplayName(savedName)
     }
     setLoading(false)
 
@@ -73,6 +76,7 @@ export function AuthProvider({ children }) {
       const refreshToken = data.session?.refresh_token
       const rawRole = data.user?.role // "ADMIN" | "HR" | ...
       const backendRole = rawRole ? rawRole.toUpperCase() : null
+      const fullName = data.employee?.full_name || data.user?.email || emailInput
 
       if (!accessToken || !backendRole) {
         return { ok: false, error: 'Invalid login response from server' }
@@ -85,6 +89,13 @@ export function AuthProvider({ children }) {
       }
       localStorage.setItem('hrive_email', emailInput)
       localStorage.setItem('hrive_role', backendRole)
+      if (fullName) {
+        localStorage.setItem('hrive_name', fullName)
+        setDisplayName(fullName)
+      } else {
+        localStorage.removeItem('hrive_name')
+        setDisplayName(null)
+      }
 
       // IMPORTANT: Hydrate Supabase Client so it handles auto-refresh
       if (refreshToken) {
@@ -136,8 +147,10 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('hrive_refresh_token')
     localStorage.removeItem('hrive_email')
     localStorage.removeItem('hrive_role')
+    localStorage.removeItem('hrive_name')
     setRole(null)
     setEmail(null)
+    setDisplayName(null)
   }
 
   const logout = async () => {
@@ -154,6 +167,7 @@ export function AuthProvider({ children }) {
       role,
       email,
       loading,
+      displayName,
       login,
       logout,
       forgotPassword,

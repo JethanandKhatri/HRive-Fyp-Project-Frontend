@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { navByPortal, portalMeta } from '../../data/portalData'
+import { useAuth } from '../../context/AuthContext'
 
 function Topbar({ portal, onLogout }) {
   const [open, setOpen] = useState(false)
+  const { displayName } = useAuth()
   const navigate = useNavigate()
   const items = navByPortal[portal] ?? []
+  const headingText = displayName || portalMeta[portal]?.label || 'Dashboard'
 
   const toggle = () => setOpen((o) => !o)
   const goTo = (path) => {
@@ -26,7 +29,7 @@ function Topbar({ portal, onLogout }) {
           <span />
         </button>
         <div>
-          <h2 className="heading">{portalMeta[portal]?.label ?? 'Dashboard'}</h2>
+          <h2 className="heading">{headingText}</h2>
         </div>
       </div>
       <div className="topbar-search">
