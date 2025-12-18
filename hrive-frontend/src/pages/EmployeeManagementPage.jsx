@@ -358,6 +358,11 @@ function EmployeeManagementPage() {
 
   return (
     <DashboardShell portal={portal} onLogout={handleLogout}>
+      {loading && (
+        <div className="page-overlay">
+          <div className="spinner spinner-lg" />
+        </div>
+      )}
       <div className="portal-tabs">
         <span className="portal-tab active">Employee Management</span>
       </div>

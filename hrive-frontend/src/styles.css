@@ -196,6 +196,7 @@ a {
   gap: 16px;
   width: 100%;
   min-width: 0;
+  position: relative;
 }
 
 .topbar {
@@ -1008,10 +1009,25 @@ a {
   animation: spin 0.9s linear infinite;
 }
 
+.spinner-lg {
+  width: 48px;
+  height: 48px;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+.page-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.72);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(1px);
 }
 
 @media (max-width: 960px) {
