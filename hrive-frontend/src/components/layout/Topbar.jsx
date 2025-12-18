@@ -8,7 +8,7 @@ function Topbar({ portal, onLogout }) {
   const { displayName } = useAuth()
   const navigate = useNavigate()
   const items = navByPortal[portal] ?? []
-  const headingText = displayName || portalMeta[portal]?.label || 'Dashboard'
+  const headingText = null // remove heading in top bar; only search stays
 
   const toggle = () => setOpen((o) => !o)
   const goTo = (path) => {
@@ -28,9 +28,6 @@ function Topbar({ portal, onLogout }) {
           <span />
           <span />
         </button>
-        <div>
-          <h2 className="heading">{headingText}</h2>
-        </div>
       </div>
       <div className="topbar-search">
         <input placeholder="Search here..." />

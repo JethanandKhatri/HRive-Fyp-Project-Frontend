@@ -204,7 +204,7 @@ a {
   border-radius: 14px;
   padding: 12px 14px;
   display: grid;
-  grid-template-columns: 1fr 1.2fr auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 12px;
   box-shadow: var(--shadow);
