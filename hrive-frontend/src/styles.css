@@ -196,7 +196,6 @@ a {
   gap: 16px;
   width: 100%;
   min-width: 0;
-  position: relative;
 }
 
 .topbar {
@@ -1028,6 +1027,16 @@ a {
   display: grid;
   place-items: center;
   backdrop-filter: blur(1px);
+}
+
+.screen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.82);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(2px);
 }
 
 @media (max-width: 960px) {
