@@ -34,13 +34,7 @@ function Sidebar({ portal, onLogout }) {
           )}
         </div>
       </div>
-      {onLogout ? (
-        <div style={{ marginTop: 'auto' }}>
-           <button onClick={onLogout} className="logout desktop-only" style={{ width: '100%', justifyContent: 'center', marginTop: '20px' }}>
-              Logout
-           </button>
-        </div>
-      ) : null}
+      {/* Desktop logout removed as requested; mobile logout remains in Topbar drawer */}
     </aside>
   )
 }
