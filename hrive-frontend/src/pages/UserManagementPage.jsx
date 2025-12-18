@@ -244,8 +244,8 @@ function UserManagementPage() {
           ) : error ? (
             <p style={{ color: 'red' }}>{error}</p>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div className="table-responsive">
+              <table className="table-compact">
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
                     <th style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)', fontWeight: 500 }}>Email</th>
@@ -259,18 +259,18 @@ function UserManagementPage() {
                     .sort((a, b) => Number(b.is_active) - Number(a.is_active)) // Active first
                     .map((user) => (
                     <tr key={user.id} style={{ borderBottom: '1px solid var(--border-light)', opacity: user.is_active ? 1 : 0.6, background: user.is_active ? 'transparent' : '#f9f9f9' }}>
-                      <td style={{ padding: '1rem 0.5rem' }}>{user.email}</td>
-                      <td style={{ padding: '1rem 0.5rem' }}>
-                        <span className="pill soft" style={{ fontSize: '0.8rem' }}>{user.role}</span>
+                      <td>{user.email}</td>
+                      <td>
+                        <span className="pill soft pill-compact">{user.role}</span>
                       </td>
-                      <td style={{ padding: '1rem 0.5rem' }}>
+                      <td>
                         {user.is_active ? (
                           <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Active</span>
                         ) : (
                           <span style={{ color: 'var(--text-muted)' }}>Inactive</span>
                         )}
                       </td>
-                      <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
+                      <td style={{ textAlign: 'right' }}>
                         <button 
                           onClick={() => handleToggleStatus(user)}
                           style={{ 

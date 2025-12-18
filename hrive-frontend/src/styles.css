@@ -983,6 +983,28 @@ a {
   cursor: pointer;
 }
 
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-compact {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table-compact th,
+.table-compact td {
+  padding: 1rem 0.5rem;
+  font-size: 0.95rem;
+}
+
+.pill-compact {
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+
 @media (max-width: 960px) {
   .page {
     grid-template-columns: 1fr;
@@ -1011,6 +1033,17 @@ a {
 
   .page-content {
     padding: 14px;
+  }
+
+  .table-compact th,
+  .table-compact td {
+    padding: 0.7rem 0.4rem;
+    font-size: 0.9rem;
+  }
+
+  .pill-compact {
+    font-size: 0.75rem;
+    padding: 5px 10px;
   }
 }
 
