@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import {
   Bar,
@@ -17,6 +17,7 @@ import ChartCard from '../components/ui/ChartCard'
 import ChatWidget from '../components/ui/ChatWidget'
 import MetricCard from '../components/ui/MetricCard'
 import { useAuth } from '../context/AuthContext'
+import { SUPABASE_FUNCTIONS_BASE } from '../lib/supabaseClient'
 import {
   activityPills,
   deepBlue,
@@ -33,6 +34,8 @@ function DashboardPage() {
   const { portalId } = useParams()
   const { logout, role } = useAuth()
   const navigate = useNavigate()
+  const [employeeStats, setEmployeeStats] = useState({ total: null, recent: null })
+  const [loadingStats, setLoadingStats] = useState(false)
   const handleLogout = () => {
     logout()
     navigate('/login')
@@ -78,10 +81,59 @@ function DashboardPage() {
   }
 
   const canChat = portal === 'hr' || portal === 'employee'
+  // Fetch live employee counts for admin/hr portals
+  useEffect(() => {
+    const shouldFetch = portal === 'admin' || portal === 'hr'
+    if (!shouldFetch) return
+
+    const fetchCounts = async () => {
+      setLoadingStats(true)
+      try {
+        const token = localStorage.getItem('hrive_access_token')
+        if (!token) throw new Error('Missing auth token')
+
+        const res = await fetch(`${SUPABASE_FUNCTIONS_BASE}/create-employee`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Failed to load employees')
+
+        const employees = data.employees || data || []
+        const total = Array.isArray(employees) ? employees.length : 0
+        const now = Date.now()
+        const recent = Array.isArray(employees)
+          ? employees.filter((emp) => {
+              const d = emp.join_date || emp.joinDate || emp.created_at
+              const ts = d ? Date.parse(d) : NaN
+              return Number.isFinite(ts) && now - ts <= 30 * 24 * 60 * 60 * 1000
+            }).length
+          : 0
+
+        setEmployeeStats({ total, recent })
+      } catch (err) {
+        console.error('Employee stats fetch failed:', err)
+        setEmployeeStats({ total: null, recent: null })
+      } finally {
+        setLoadingStats(false)
+      }
+    }
+
+    fetchCounts()
+  }, [portal])
 
   const stackData = salaryStacked[portal] ?? []
   const barKeys = stackData.length ? Object.keys(stackData[0]).filter((k) => k !== 'month') : []
   const barPalette = [deepBlue, '#f4c542', highlight]
+  const metricData = (metrics[portal] ?? []).map((m) => {
+    if (m.label === 'Total Employee' && employeeStats.total !== null) {
+      return { ...m, value: String(employeeStats.total) }
+    }
+    if (m.label === 'New Employee' && employeeStats.recent !== null) {
+      return { ...m, value: String(employeeStats.recent) }
+    }
+    return m
+  })
 
   return (
     <DashboardShell portal={portal} onLogout={handleLogout}>
@@ -104,7 +156,7 @@ function DashboardPage() {
 
       <div className="content-grid">
         <div className="cards-grid">
-          {metrics[portal].map((metric) => (
+          {metricData.map((metric) => (
             <MetricCard key={metric.label} {...metric} />
           ))}
         </div>
