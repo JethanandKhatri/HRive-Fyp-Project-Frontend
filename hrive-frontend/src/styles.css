@@ -29,6 +29,7 @@ body {
   font-family: 'Manrope', 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--text);
+  overflow-x: hidden; /* prevent horizontal scroll on small screens */
 }
 
 a {
@@ -40,6 +41,8 @@ a {
   display: grid;
   grid-template-columns: 260px 1fr;
   min-height: 100vh;
+  width: 100%;
+  min-width: 0;
 }
 
 .sidebar {
@@ -191,6 +194,8 @@ a {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
 }
 
 .topbar {
@@ -203,6 +208,8 @@ a {
   align-items: center;
   gap: 12px;
   box-shadow: var(--shadow);
+  width: 100%;
+  min-width: 0;
 }
 
 .topbar-left {
@@ -472,12 +479,14 @@ a {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
+  min-width: 0;
 }
 
 .metric-card {
@@ -985,6 +994,7 @@ a {
 
   .topbar {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .topbar-actions {
@@ -997,6 +1007,10 @@ a {
 
   .mobile-only {
     display: inline-flex !important;
+  }
+
+  .page-content {
+    padding: 14px;
   }
 }
 
