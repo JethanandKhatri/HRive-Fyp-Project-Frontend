@@ -1,8 +1,10 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { navByPortal, portalMeta } from '../../data/portalData'
+import { useAuth } from '../../context/AuthContext'
 
 function Sidebar({ portal, onLogout }) {
+  const { displayName } = useAuth()
   const items = navByPortal[portal] ?? []
   
   return (
@@ -12,9 +14,9 @@ function Sidebar({ portal, onLogout }) {
         <div className="brand-name">Logo</div>
       </div>
       <div className="user-card">
-        <div className="avatar">{portalMeta[portal]?.label?.[0] ?? '?'}</div>
+        <div className="avatar">{(displayName?.[0] || portalMeta[portal]?.label?.[0] || '?').toUpperCase()}</div>
         <div>
-          <p className="user-name">{portalMeta[portal]?.greeting ?? 'Welcome'}</p>
+          <p className="user-name">{displayName || 'Welcome'}</p>
           <p className="user-role">{portalMeta[portal]?.description ?? ''}</p>
         </div>
       </div>
