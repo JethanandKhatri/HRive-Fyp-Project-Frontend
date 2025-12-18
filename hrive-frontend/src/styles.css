@@ -999,7 +999,9 @@ a {
 
   .topbar {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
+    padding: 10px 12px;
+    align-items: stretch;
   }
 
   .topbar-actions {
@@ -1027,6 +1029,10 @@ a {
   .pill-compact {
     font-size: 0.75rem;
     padding: 5px 10px;
+  }
+
+  .topbar-search {
+    width: 100%;
   }
 }
 
