@@ -370,7 +370,7 @@ a {
   left: 0;
   height: 100vh;
   width: 260px;
-  background: #0f6577;
+  background: var(--midnight-steel);
   color: #e9f7fb;
   box-shadow: 8px 0 30px rgba(0, 0, 0, 0.2);
   padding: 16px;
