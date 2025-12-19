@@ -65,7 +65,7 @@ function EmployeeManagementPage() {
       // Parallel fetch for dependencies
       const empPromise = fetch(`${EMPLOYEE_ENDPOINT}`, { headers })
       const deptPromise = fetch(`${SUPABASE_FUNCTIONS_BASE}/departments`, { headers })
-      const userPromise = fetch(`${SUPABASE_FUNCTIONS_BASE}/manage-app-users?eligible=true`, { headers })
+      const userPromise = fetch(`${SUPABASE_FUNCTIONS_BASE}/create-user`, { headers })
 
       const [empRes, deptRes, userRes] = await Promise.all([empPromise, deptPromise, userPromise])
 
@@ -117,7 +117,7 @@ function EmployeeManagementPage() {
       if (userRes.ok && userRes.status !== 204) {
         try {
           const userData = await userRes.json()
-          setUsers(userData.users || userData.data || userData || [])
+          setUsers(userData.users || userData || [])
         } catch (e) {
           console.error('Users parse error', e)
           setUserLoadError('Unable to parse users list.')
@@ -275,7 +275,7 @@ function EmployeeManagementPage() {
       if (!token) throw new Error('Auth token missing. Please login again.')
       if (!inlineUserEmail) throw new Error('User email is required to create a new user.')
 
-      const res = await fetch(`${SUPABASE_FUNCTIONS_BASE}/manage-app-users`, {
+      const res = await fetch(`${SUPABASE_FUNCTIONS_BASE}/create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
