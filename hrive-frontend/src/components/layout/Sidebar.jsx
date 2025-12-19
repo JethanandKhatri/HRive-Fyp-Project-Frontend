@@ -11,7 +11,7 @@ function Sidebar({ portal, onLogout }) {
   return (
     <aside className="sidebar">
       <div className="brand">
-        <img src="/logo-3.jpeg" alt="Logo" className="brand-logo" />
+        <img src="/logo-2.jpeg" alt="Logo" className="brand-logo" />
         <div className="brand-name">HRive</div>
       </div>
       {/* User card removed as requested */}
