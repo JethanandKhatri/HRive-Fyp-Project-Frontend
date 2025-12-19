@@ -117,26 +117,6 @@ function UserManagementPage() {
     }
   }
 
-  const handleDeleteUser = async (userId) => {
-    if (!window.confirm('Are you sure you want to delete this user? This cannot be undone.')) return
-
-    try {
-      const token = getToken()
-      const res = await fetch(`${SUPABASE_FUNCTIONS_BASE}/manage-app-users?id=${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to delete user')
-      
-      fetchUsers() // Refresh list
-    } catch (err) {
-      alert(err.message)
-    }
-  }
-
   const handleToggleStatus = async (user) => {
     const action = user.is_active ? 'disable' : 'enable'
     if (!window.confirm(`Are you sure you want to ${action} this user?`)) return
