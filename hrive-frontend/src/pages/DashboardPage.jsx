@@ -82,8 +82,7 @@ function DashboardPage() {
   }
 
   const canChat = portal === 'hr' || portal === 'employee'
-  // Personalized greeting fallback
-  const greetingText = displayName ? `Welcome, ${displayName}` : portalMeta[portal].greeting
+  const heroHeading = `${portalMeta[portal].label} Overview`
   const descriptionText = portalMeta[portal].description
   // Fetch live employee counts for admin/hr portals
   useEffect(() => {
@@ -141,23 +140,6 @@ function DashboardPage() {
 
   return (
     <DashboardShell portal={portal} onLogout={handleLogout}>
-      <div className="portal-tabs">
-        <span className="portal-tab active">{portalMeta[portal].label} Portal</span>
-      </div>
-
-      <div className="hero-banner">
-        <div>
-          <p className="tag">{portalMeta[portal].label} Portal</p>
-          <h2>{greetingText}</h2>
-          <p className="muted">{descriptionText}</p>
-        </div>
-        <div className="hero-quick">
-          <span className="pill strong">Live</span>
-          <span className="pill soft">SLA 99.9%</span>
-          <span className="pill soft">Chatbot Active</span>
-        </div>
-      </div>
-
       <div className="content-grid">
         <div className="cards-grid metric-grid">
           {loadingStats ? (

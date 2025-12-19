@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { navByPortal, navSectionsByPortal, portalMeta } from '../../data/portalData'
 
@@ -7,6 +7,15 @@ function Sidebar({ portal, onLogout }) {
   const sections = navSectionsByPortal[portal] ?? []
   const portalLabel = portalMeta[portal]?.label ?? 'Portal'
   const navSections = sections.length ? sections : [{ title: 'Menu', items }]
+  const defaultOpenTitle = useMemo(() => {
+    if (!navSections.length) return null
+    return navSections.find((section) => section.title === 'Overview')?.title ?? navSections[0].title
+  }, [navSections])
+  const [openSection, setOpenSection] = useState(defaultOpenTitle)
+
+  useEffect(() => {
+    setOpenSection(defaultOpenTitle)
+  }, [defaultOpenTitle, portal])
   
   return (
     <aside className="sidebar">
@@ -20,17 +29,27 @@ function Sidebar({ portal, onLogout }) {
         <div className="sidenav-groups">
           {navSections.map((section) => (
             <div className="sidenav-group" key={section.title}>
-              <p className="sidenav-group-title">{section.title}</p>
-              <div className="sidenav-group-items">
-                {section.items.map((item) => {
-                  const to = item.path ? `/portal/${portal}/${item.path}` : `/portal/${portal}`
-                  return (
-                    <NavLink key={item.label} to={to} className="sidenav-item">
-                      {item.label}
-                    </NavLink>
-                  )
-                })}
-              </div>
+              <button
+                type="button"
+                className="sidenav-group-toggle"
+                onClick={() => setOpenSection((prev) => (prev === section.title ? null : section.title))}
+                aria-expanded={openSection === section.title}
+              >
+                <span>{section.title}</span>
+                <span className={`chevron ${openSection === section.title ? 'open' : ''}`} aria-hidden="true" />
+              </button>
+              {openSection === section.title ? (
+                <div className="sidenav-group-items">
+                  {section.items.map((item) => {
+                    const to = item.path ? `/portal/${portal}/${item.path}` : `/portal/${portal}`
+                    return (
+                      <NavLink key={item.label} to={to} className="sidenav-item">
+                        {item.label}
+                      </NavLink>
+                    )
+                  })}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>

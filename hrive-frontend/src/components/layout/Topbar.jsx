@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { navByPortal, navSectionsByPortal, portalMeta } from '../../data/portalData'
 import { useAuth } from '../../context/AuthContext'
@@ -11,6 +11,12 @@ function Topbar({ portal, onLogout }) {
   const sections = navSectionsByPortal[portal] ?? []
   const drawerSections = sections.length ? sections : [{ title: 'Menu', items }]
   const headingText = null // remove heading in top bar; only search stays
+  const greetingText = displayName ? `Welcome, ${displayName}` : portalMeta[portal]?.greeting ?? 'Welcome'
+  const defaultOpenTitle = useMemo(() => {
+    if (!drawerSections.length) return null
+    return drawerSections.find((section) => section.title === 'Overview')?.title ?? drawerSections[0].title
+  }, [drawerSections])
+  const [openSection, setOpenSection] = useState(defaultOpenTitle)
 
   const toggle = () => setOpen((o) => !o)
   const goTo = (path) => {
@@ -22,6 +28,10 @@ function Topbar({ portal, onLogout }) {
     }
   }
 
+  useEffect(() => {
+    setOpenSection(defaultOpenTitle)
+  }, [defaultOpenTitle, portal])
+
   return (
     <header className="topbar">
       <div className="topbar-left">
@@ -30,6 +40,7 @@ function Topbar({ portal, onLogout }) {
           <span />
           <span />
         </button>
+        <div className="topbar-greeting">{greetingText}</div>
       </div>
       <div className="topbar-search">
         <input placeholder="Search here..." />
@@ -52,14 +63,24 @@ function Topbar({ portal, onLogout }) {
         <div className="drawer-sections">
           {drawerSections.map((section) => (
             <div className="sidenav-group" key={section.title}>
-              <p className="sidenav-group-title">{section.title}</p>
-              <div className="dropdown-nav">
-                {section.items.map((item) => (
-                  <button key={item.label} onClick={() => goTo(item.path)}>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+              <button
+                type="button"
+                className="sidenav-group-toggle"
+                onClick={() => setOpenSection((prev) => (prev === section.title ? null : section.title))}
+                aria-expanded={openSection === section.title}
+              >
+                <span>{section.title}</span>
+                <span className={`chevron ${openSection === section.title ? 'open' : ''}`} aria-hidden="true" />
+              </button>
+              {openSection === section.title ? (
+                <div className="dropdown-nav">
+                  {section.items.map((item) => (
+                    <button key={item.label} onClick={() => goTo(item.path)}>
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
