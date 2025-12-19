@@ -26,7 +26,7 @@ function LoginPage() {
     <div className="auth-page">
       <div className="auth-card glass">
         <div className="auth-hero">
-          <img src="/logo%203.jpeg" alt="Logo" className="auth-logo" />
+          <img src="/logo.jpg" alt="Logo" className="auth-logo" />
         </div>
         <form className="auth-form" onSubmit={handleSubmit}>
           <label>
