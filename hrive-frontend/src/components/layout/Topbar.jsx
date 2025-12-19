@@ -11,7 +11,7 @@ function Topbar({ portal, onLogout }) {
   const sections = navSectionsByPortal[portal] ?? []
   const drawerSections = sections.length ? sections : [{ title: 'Menu', items }]
   const headingText = null // remove heading in top bar; only search stays
-  const greetingText = displayName ? `Welcome, ${displayName}` : portalMeta[portal]?.greeting ?? 'Welcome'
+  const greetingText = displayName || portalMeta[portal]?.label ?? ''
   const defaultOpenTitle = useMemo(() => {
     if (!drawerSections.length) return null
     return drawerSections.find((section) => section.title === 'Overview')?.title ?? drawerSections[0].title
