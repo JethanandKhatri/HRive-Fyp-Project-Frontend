@@ -17,18 +17,37 @@ export function AuthProvider({ children }) {
 
   // App load par localStorage se state restore karo
   useEffect(() => {
-    // Initial load from local storage
-    const token = localStorage.getItem('hrive_access_token')
-    const savedEmail = localStorage.getItem('hrive_email')
-    const savedRole = localStorage.getItem('hrive_role')
-    const savedName = localStorage.getItem('hrive_name')
+    let isMounted = true
+    const hydrateSession = async () => {
+      // Initial load from local storage
+      const token = localStorage.getItem('hrive_access_token')
+      const refreshToken = localStorage.getItem('hrive_refresh_token')
+      const savedEmail = localStorage.getItem('hrive_email')
+      const savedRole = localStorage.getItem('hrive_role')
+      const savedName = localStorage.getItem('hrive_name')
 
-    if (token && savedEmail && savedRole) {
-      setEmail(savedEmail)
-      setRole(savedRole)
-      if (savedName) setDisplayName(savedName)
+      if (token && savedEmail && savedRole) {
+        setEmail(savedEmail)
+        setRole(savedRole)
+        if (savedName) setDisplayName(savedName)
+      }
+
+      // Ensure Supabase client has a session after reload so auto-refresh keeps working
+      if (token && refreshToken) {
+        try {
+          await supabase.auth.setSession({
+            access_token: token,
+            refresh_token: refreshToken,
+          })
+        } catch (err) {
+          console.error('Failed to hydrate Supabase session:', err)
+        }
+      }
+
+      if (isMounted) setLoading(false)
     }
-    setLoading(false)
+
+    hydrateSession()
 
     // Listen for auth changes (auto-refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -36,7 +55,7 @@ export function AuthProvider({ children }) {
         console.log('Token refreshed/updated automatically by Supabase')
         if (session) {
            localStorage.setItem('hrive_access_token', session.access_token)
-           if(session.refresh_token) localStorage.setItem('hrive_refresh_token', session.refresh_token)
+           if (session.refresh_token) localStorage.setItem('hrive_refresh_token', session.refresh_token)
         }
       } 
       if (event === 'SIGNED_OUT') {
@@ -45,6 +64,7 @@ export function AuthProvider({ children }) {
     })
 
     return () => {
+      isMounted = false
       subscription.unsubscribe()
     }
   }, [])
