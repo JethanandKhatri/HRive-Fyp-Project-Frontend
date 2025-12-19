@@ -1,33 +1,38 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { navByPortal, portalMeta } from '../../data/portalData'
-import { useAuth } from '../../context/AuthContext'
+import { navByPortal, navSectionsByPortal, portalMeta } from '../../data/portalData'
 
 function Sidebar({ portal, onLogout }) {
-  const { displayName } = useAuth()
   const items = navByPortal[portal] ?? []
+  const sections = navSectionsByPortal[portal] ?? []
+  const portalLabel = portalMeta[portal]?.label ?? 'Portal'
+  const navSections = sections.length ? sections : [{ title: 'Menu', items }]
   
   return (
     <aside className="sidebar">
       <div className="brand">
-        <img src="/logo.jpg" alt="Logo" className="brand-logo" />
+        <img src="/logo%203.jpeg" alt="Logo" className="brand-logo" />
         <div className="brand-name">Logo</div>
       </div>
       {/* User card removed as requested */}
       <div className="sidenav desktop-only">
-        <div className="sidenav-section">
-          <p className="sidenav-title">{portalMeta[portal]?.label ?? 'Portal'}</p>
-          {items.map((item, idx) =>
-            idx === 0 ? (
-              <NavLink key={item.label} to={`/portal/${portal}`} className="sidenav-item">
-                {item.label}
-              </NavLink>
-            ) : (
-              <NavLink key={item.label} to={`/portal/${portal}/${item.path}`} className="sidenav-item">
-                {item.label}
-              </NavLink>
-            ),
-          )}
+        <p className="sidenav-title">{portalLabel}</p>
+        <div className="sidenav-groups">
+          {navSections.map((section) => (
+            <div className="sidenav-group" key={section.title}>
+              <p className="sidenav-group-title">{section.title}</p>
+              <div className="sidenav-group-items">
+                {section.items.map((item) => {
+                  const to = item.path ? `/portal/${portal}/${item.path}` : `/portal/${portal}`
+                  return (
+                    <NavLink key={item.label} to={to} className="sidenav-item">
+                      {item.label}
+                    </NavLink>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
       {/* Desktop logout removed as requested; mobile logout remains in Topbar drawer */}

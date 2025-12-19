@@ -126,6 +126,52 @@ export const navByPortal = {
   ],
 }
 
+const buildNavSections = (items, sections) => {
+  const byLabel = items.reduce((acc, item) => {
+    acc[item.label] = item
+    return acc
+  }, {})
+
+  return sections
+    .map((section) => ({
+      title: section.title,
+      items: section.labels.map((label) => byLabel[label]).filter(Boolean),
+    }))
+    .filter((section) => section.items.length)
+}
+
+export const navSectionsByPortal = {
+  hr: buildNavSections(navByPortal.hr, [
+    { title: 'Overview', labels: ['HR Dashboard'] },
+    { title: 'Communication', labels: ['Chat HR', 'HR Social'] },
+    { title: 'Calendar', labels: ['Holidays', 'Events', 'Activities'] },
+    { title: 'People', labels: ['Employees', 'Accounts'] },
+    { title: 'Payroll', labels: ['Payroll'] },
+  ]),
+  admin: buildNavSections(navByPortal.admin, [
+    { title: 'Overview', labels: ['Admin Dashboard'] },
+    { title: 'People', labels: ['User Management', 'Employees', 'Departments'] },
+    { title: 'Operations', labels: ['Systems', 'Policies'] },
+    { title: 'Risk', labels: ['Audit', 'Security'] },
+    { title: 'Finance', labels: ['Billing'] },
+  ]),
+  manager: buildNavSections(navByPortal.manager, [
+    { title: 'Overview', labels: ['Manager Dashboard'] },
+    { title: 'Communication', labels: ['Chat HR', 'Ask HR Bot'] },
+    { title: 'Delivery', labels: ['Projects', 'Squads'] },
+    { title: 'Risk', labels: ['Risks'] },
+    { title: 'Approvals', labels: ['Approvals'] },
+  ]),
+  employee: buildNavSections(navByPortal.employee, [
+    { title: 'Overview', labels: ['My Dashboard'] },
+    { title: 'Communication', labels: ['Chat HR', 'Ask HR Bot'] },
+    { title: 'Work', labels: ['Tasks', 'Approvals'] },
+    { title: 'Finance', labels: ['Payslips'] },
+    { title: 'Time', labels: ['Time Off'] },
+    { title: 'Growth', labels: ['Growth'] },
+  ]),
+}
+
 export const chatSeeds = {
   admin: [{ from: 'bot', text: 'Chat is available for HR, Manager, and Employees.' }],
   manager: [

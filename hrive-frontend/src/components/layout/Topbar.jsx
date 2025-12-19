@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { navByPortal, portalMeta } from '../../data/portalData'
+import { navByPortal, navSectionsByPortal, portalMeta } from '../../data/portalData'
 import { useAuth } from '../../context/AuthContext'
 
 function Topbar({ portal, onLogout }) {
@@ -8,6 +8,8 @@ function Topbar({ portal, onLogout }) {
   const { displayName } = useAuth()
   const navigate = useNavigate()
   const items = navByPortal[portal] ?? []
+  const sections = navSectionsByPortal[portal] ?? []
+  const drawerSections = sections.length ? sections : [{ title: 'Menu', items }]
   const headingText = null // remove heading in top bar; only search stays
 
   const toggle = () => setOpen((o) => !o)
@@ -47,11 +49,18 @@ function Topbar({ portal, onLogout }) {
             ×
           </button>
         </div>
-        <div className="dropdown-nav">
-          {items.map((item) => (
-            <button key={item.label} onClick={() => goTo(item.path)}>
-              {item.label}
-            </button>
+        <div className="drawer-sections">
+          {drawerSections.map((section) => (
+            <div className="sidenav-group" key={section.title}>
+              <p className="sidenav-group-title">{section.title}</p>
+              <div className="dropdown-nav">
+                {section.items.map((item) => (
+                  <button key={item.label} onClick={() => goTo(item.path)}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
         {onLogout ? (
