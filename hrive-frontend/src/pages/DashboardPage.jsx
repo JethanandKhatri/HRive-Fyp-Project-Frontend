@@ -25,8 +25,10 @@ import {
   hrApplicants,
   hrAttendanceStats,
   hrBirthdays,
+  hrClockRows,
   hrDepartmentStats,
   hrEvents,
+  hrHiringPipeline,
   hrStatusBreakdown,
   incomeSlices,
   metrics,
@@ -135,6 +137,14 @@ function DashboardPage() {
   const barPalette = [deepBlue, '#f4c542', highlight]
   const isHr = portal === 'hr'
   const hrStatusTotal = hrStatusBreakdown.reduce((sum, item) => sum + item.value, 0)
+  const stageSteps = ['Screening', 'Review', 'Interview', 'Offer']
+  const attendanceValues = hrAttendanceStats.map((stat) => stat.value)
+  const onTimePct = attendanceValues[0] ?? 0
+  const latePct = attendanceValues[1] ?? 0
+  const absentPct = attendanceValues[2] ?? 0
+  const attendanceGradient = `conic-gradient(${hrAttendanceStats[0].color} 0 ${onTimePct}%, ${hrAttendanceStats[1].color} ${onTimePct}% ${
+    onTimePct + latePct
+  }%, ${hrAttendanceStats[2].color} ${onTimePct + latePct}% 100%)`
   const getInitials = (name) =>
     name
       .split(' ')
@@ -149,6 +159,7 @@ function DashboardPage() {
     Offer: 'tone-green',
     Screening: 'tone-amber',
   }
+  const pipelineMax = Math.max(...hrHiringPipeline.map((step) => step.count))
   const metricData = (metrics[portal] ?? []).map((m) => {
     if (m.label === 'Total Employee' && employeeStats.total !== null) {
       return { ...m, value: String(employeeStats.total) }
@@ -267,19 +278,22 @@ function DashboardPage() {
         {isHr ? (
           <div className="bottom-grid">
             <ChartCard title="Attendance Overview" compact>
-              <div className="hr-attendance-list">
-                {hrAttendanceStats.map((stat) => (
-                  <div key={stat.label} className="hr-attendance-row">
-                    <span className="hr-attendance-label">
-                      <span className="hr-dot" style={{ background: stat.color }} />
-                      {stat.label}
-                    </span>
-                    <div className="hr-attendance-track">
-                      <div className="hr-attendance-fill" style={{ width: `${stat.value}%`, background: stat.color }} />
-                    </div>
-                    <span className="hr-attendance-value">{stat.value}%</span>
+              <div className="hr-attendance-visual">
+                <div className="hr-ring" style={{ background: attendanceGradient }}>
+                  <div className="hr-ring-center">
+                    <div className="hr-ring-value">{onTimePct}%</div>
+                    <div className="hr-ring-label">On time</div>
                   </div>
-                ))}
+                </div>
+                <div className="hr-chip-row">
+                  {hrAttendanceStats.map((stat) => (
+                    <div key={stat.label} className="hr-chip">
+                      <span className="hr-chip-dot" style={{ background: stat.color }} />
+                      <span className="hr-chip-value">{stat.value}%</span>
+                      <span className="hr-chip-label">{stat.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </ChartCard>
 
@@ -294,40 +308,101 @@ function DashboardPage() {
               </ul>
             </ChartCard>
 
+            <ChartCard title="Clock In/Out" compact>
+              <div className="hr-clock-header">
+                <button className="hr-filter-pill">All Departments</button>
+                <button className="hr-filter-pill">Today</button>
+              </div>
+              <ul className="hr-clock-list">
+                {hrClockRows.map((row) => (
+                  <li key={row.name}>
+                    <div className="hr-clock-main">
+                      <span className="hr-avatar">{getInitials(row.name)}</span>
+                      <div className="hr-clock-info">
+                        <span className="hr-clock-name">{row.name}</span>
+                        <span className="hr-clock-role">{row.role}</span>
+                      </div>
+                    </div>
+                    <span className={`hr-clock-time ${row.status === 'In' ? 'in' : 'out'}`}>{row.time}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="hr-clock-foot">
+                <span className="hr-legend-dot in" />
+                <span>Clock In</span>
+                <span className="hr-legend-dot out" />
+                <span>Clock Out</span>
+              </div>
+            </ChartCard>
+
             <ChartCard title="Job Applicants" compact>
               <ul className="hr-people-list">
-                {hrApplicants.map((applicant) => (
+                {hrApplicants.map((applicant) => {
+                  const stageIndex = stageSteps.indexOf(applicant.stage)
+                  return (
                   <li key={applicant.name}>
                     <div className="hr-people-main">
                       <span className="hr-avatar">{getInitials(applicant.name)}</span>
-                      <div>
+                      <div className="hr-people-info">
                         <span className="hr-people-name">{applicant.name}</span>
                         <span className="hr-people-role">{applicant.role}</span>
+                        <div className="hr-stage-track">
+                          {stageSteps.map((step, idx) => (
+                            <span
+                              key={step}
+                              className={`hr-stage-dot ${idx <= stageIndex ? 'active' : ''}`}
+                              aria-hidden="true"
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <span className={`hr-people-stage ${stageTone[applicant.stage] ?? ''}`}>{applicant.stage}</span>
                   </li>
-                ))}
+                )})}
               </ul>
             </ChartCard>
 
+            <ChartCard title="Hiring Pipeline" compact>
+              <div className="hr-funnel">
+                {hrHiringPipeline.map((step) => (
+                  <div key={step.stage} className="hr-funnel-row">
+                    <span className="hr-funnel-label">{step.stage}</span>
+                    <div className="hr-funnel-track">
+                      <div
+                        className="hr-funnel-fill"
+                        style={{ width: `${(step.count / pipelineMax) * 100}%`, background: step.color }}
+                      />
+                    </div>
+                    <span className="hr-funnel-count">{step.count}</span>
+                  </div>
+                ))}
+              </div>
+            </ChartCard>
+
             <ChartCard title="Upcoming Events" compact>
-              <ul className="hr-activity-list">
+              <ul className="hr-timeline">
                 {hrEvents.map((event) => (
                   <li key={event.title}>
-                    <span className="hr-activity-title">{event.title}</span>
-                    <span className="hr-activity-time">{event.time}</span>
+                    <span className="hr-timeline-dot" aria-hidden="true" />
+                    <div className="hr-timeline-body">
+                      <span className="hr-activity-title">{event.title}</span>
+                      <span className="hr-activity-time">{event.time}</span>
+                    </div>
                   </li>
                 ))}
               </ul>
             </ChartCard>
 
             <ChartCard title="Recent Activity" compact>
-              <ul className="hr-activity-list">
+              <ul className="hr-timeline">
                 {hrActivities.map((activity) => (
                   <li key={activity.title}>
-                    <span className="hr-activity-title">{activity.title}</span>
-                    <span className="hr-activity-time">{activity.time}</span>
+                    <span className="hr-timeline-dot" aria-hidden="true" />
+                    <div className="hr-timeline-body">
+                      <span className="hr-activity-title">{activity.title}</span>
+                      <span className="hr-activity-time">{activity.time}</span>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -339,7 +414,7 @@ function DashboardPage() {
                   <li key={person.name}>
                     <div className="hr-birthday-main">
                       <span className="hr-avatar hr-avatar-sun">{getInitials(person.name)}</span>
-                      <div>
+                      <div className="hr-birthday-info">
                         <span className="hr-birthday-name">{person.name}</span>
                         <span className="hr-birthday-role">{person.role}</span>
                       </div>

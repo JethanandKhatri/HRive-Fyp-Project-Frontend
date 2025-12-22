@@ -127,6 +127,20 @@ export const hrBirthdays = [
   { name: 'Nina Patel', role: 'HR Analyst', date: 'Fri' },
 ]
 
+export const hrClockRows = [
+  { name: 'Daniel Esbella', role: 'UI/UX Designer', time: '09:15', status: 'In' },
+  { name: 'Doglas Martini', role: 'Project Manager', time: '09:36', status: 'In' },
+  { name: 'Brian Villalobos', role: 'PHP Developer', time: '09:15', status: 'In' },
+]
+
+export const hrHiringPipeline = [
+  { stage: 'Applied', count: 124, color: '#0ea5e9' },
+  { stage: 'Screen', count: 86, color: '#38bdf8' },
+  { stage: 'Interview', count: 52, color: '#22c55e' },
+  { stage: 'Offer', count: 18, color: '#f59e0b' },
+  { stage: 'Hired', count: 9, color: '#16a34a' },
+]
+
 export const navByPortal = {
   hr: [
     { label: 'HR Dashboard', path: '' },
