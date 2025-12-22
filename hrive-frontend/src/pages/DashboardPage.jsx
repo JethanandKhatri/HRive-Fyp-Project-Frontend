@@ -14,7 +14,6 @@ import {
 } from 'recharts'
 import DashboardShell from '../components/layout/DashboardShell'
 import ChartCard from '../components/ui/ChartCard'
-import ChatWidget from '../components/ui/ChatWidget'
 import MetricCard from '../components/ui/MetricCard'
 import { useAuth } from '../context/AuthContext'
 import { SUPABASE_FUNCTIONS_BASE } from '../lib/supabaseClient'
@@ -81,7 +80,6 @@ function DashboardPage() {
       )
   }
 
-  const canChat = portal === 'hr' || portal === 'employee'
   const heroHeading = `${portalMeta[portal].label} Overview`
   const descriptionText = portalMeta[portal].description
   // Fetch live employee counts for admin/hr portals
@@ -223,9 +221,6 @@ function DashboardPage() {
             </ul>
           </ChartCard>
 
-          <ChartCard title="Chatbot" subtitle={canChat ? 'HR & Employee assistant' : 'Available for HR/Employee'}>
-            <ChatWidget portal={portal} />
-          </ChartCard>
         </div>
       </div>
     </DashboardShell>
