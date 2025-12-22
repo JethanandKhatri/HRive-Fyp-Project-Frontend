@@ -2,11 +2,11 @@
 
 :root {
   /* 5-Color Palette */
-  --midnight-steel: #0F172A;
-  --deep-teal-forge: #366376;
-  --frosted-mist: #D1E0D9;
-  --growth-leaf: #7CA964;
-  --evergreen-core: #2D4F3C;
+  --midnight-steel: #102a43;
+  --deep-teal-forge: #2a6f6a;
+  --frosted-mist: #e8f1ed;
+  --growth-leaf: #7fb069;
+  --evergreen-core: #1f3b34;
 
   /* Theme Mapping */
   --bg: var(--frosted-mist);
@@ -16,7 +16,7 @@
   --muted: var(--deep-teal-forge);
   --accent: var(--deep-teal-forge);
   --deep: var(--evergreen-core);
-  --yellow: #f4c542;
+  --yellow: #f4a261;
   --shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
 }
 
@@ -273,7 +273,7 @@ a {
   border-radius: 14px;
   padding: 12px 14px;
   display: grid;
-  grid-template-columns: auto minmax(220px, 420px) auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 12px;
   box-shadow: var(--shadow);
@@ -291,6 +291,44 @@ a {
   font-weight: 700;
   color: var(--deep);
   white-space: nowrap;
+}
+
+.topbar-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #c7f0e7, #9ee7d6);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #1f4d46;
+}
+
+.topbar-hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.topbar-welcome {
+  font-weight: 800;
+  color: var(--deep);
+}
+
+.topbar-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.topbar-highlight {
+  color: #e76f51;
+  font-weight: 800;
 }
 
 .crumb {
@@ -395,7 +433,28 @@ a {
 
 .topbar-actions.simple {
   justify-content: flex-end;
-  gap: 0;
+  gap: 10px;
+}
+
+.action-button {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.action-button.soft {
+  background: #eef8f5;
+  color: #1f4d46;
+  border-color: rgba(42, 111, 106, 0.22);
+}
+
+.action-button.solid {
+  background: #e76f51;
+  color: #fff;
+  border-color: #c85a3f;
+  box-shadow: 0 10px 24px rgba(231, 111, 81, 0.3);
 }
 
 .mobile-only {
@@ -1795,14 +1854,16 @@ a {
 
   .topbar {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
     padding: 12px;
   }
 
   .topbar-actions {
-    display: none;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .auth-card {

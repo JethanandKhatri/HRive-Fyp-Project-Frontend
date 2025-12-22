@@ -12,6 +12,14 @@ function Topbar({ portal, onLogout }) {
   const drawerSections = sections.length ? sections : [{ title: 'Menu', items }]
   const headingText = null // remove heading in top bar; only search stays
   const greetingText = displayName || (portalMeta[portal]?.label ?? '')
+  const userName = displayName || 'Adrian'
+  const initials = userName
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
   const defaultOpenTitle = useMemo(() => {
     if (!drawerSections.length) return null
     return drawerSections.find((section) => section.title === 'Overview')?.title ?? drawerSections[0].title
@@ -40,12 +48,22 @@ function Topbar({ portal, onLogout }) {
           <span />
           <span />
         </button>
-        <div className="topbar-greeting">{greetingText}</div>
-      </div>
-      <div className="topbar-search">
-        <input placeholder="Search here..." />
+        <div className="topbar-hero">
+          <div className="topbar-avatar" aria-hidden="true">
+            {initials}
+          </div>
+          <div className="topbar-hero-text">
+            <div className="topbar-welcome">Welcome Back, {userName}</div>
+            <div className="topbar-subtitle">
+              You have <span className="topbar-highlight">21</span> Pending Approvals &{' '}
+              <span className="topbar-highlight">14</span> Leave Requests
+            </div>
+          </div>
+        </div>
       </div>
       <div className="topbar-actions simple">
+        <button className="action-button soft">Add Project</button>
+        <button className="action-button solid">Add Requests</button>
         {onLogout ? (
           <button className="logout topbar-logout desktop-only" onClick={onLogout}>
             Logout
