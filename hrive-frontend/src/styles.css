@@ -1069,7 +1069,16 @@ a {
 
 .hr-activity-time {
   font-size: 12px;
-  color: var(--muted);
+  color: #0f172a;
+  font-weight: 700;
+  align-self: flex-start;
+  background: linear-gradient(135deg, rgba(13, 91, 108, 0.18), rgba(30, 202, 195, 0.18));
+  border: 1px solid rgba(13, 91, 108, 0.24);
+  padding: 4px 8px;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(13, 91, 108, 0.15);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .hr-avatar {
@@ -1244,34 +1253,69 @@ a {
 
 .hr-funnel-row {
   display: grid;
-  grid-template-columns: 90px 1fr 36px;
-  gap: 10px;
+  grid-template-columns: 120px 1fr 56px;
+  gap: 12px;
   align-items: center;
   font-size: 13px;
 }
 
+.hr-funnel-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hr-funnel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.06);
+}
+
 .hr-funnel-label {
-  color: var(--muted);
-  font-weight: 600;
+  color: var(--deep);
+  font-weight: 700;
 }
 
 .hr-funnel-track {
-  height: 12px;
-  background: #eef3f6;
+  position: relative;
+  height: 18px;
+  background: #f1f5f9;
   border-radius: 999px;
   overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .hr-funnel-fill {
   height: 100%;
   border-radius: 999px;
   transition: width 0.6s ease;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+
+.hr-funnel-percent {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 6px;
+  border-radius: 999px;
 }
 
 .hr-funnel-count {
   text-align: right;
-  font-weight: 700;
-  color: var(--deep);
+  font-weight: 800;
+  color: #0f172a;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 4px 8px;
+  border-radius: 999px;
+  min-width: 48px;
+  justify-self: end;
 }
 
 .hr-timeline {

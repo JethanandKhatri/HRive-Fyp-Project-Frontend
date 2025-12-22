@@ -365,18 +365,25 @@ function DashboardPage() {
 
             <ChartCard title="Hiring Pipeline" compact>
               <div className="hr-funnel">
-                {hrHiringPipeline.map((step) => (
-                  <div key={step.stage} className="hr-funnel-row">
-                    <span className="hr-funnel-label">{step.stage}</span>
-                    <div className="hr-funnel-track">
-                      <div
-                        className="hr-funnel-fill"
-                        style={{ width: `${(step.count / pipelineMax) * 100}%`, background: step.color }}
-                      />
+                {hrHiringPipeline.map((step) => {
+                  const pct = Math.round((step.count / pipelineMax) * 100)
+                  return (
+                    <div key={step.stage} className="hr-funnel-row">
+                      <div className="hr-funnel-left">
+                        <span className="hr-funnel-dot" style={{ background: step.color }} />
+                        <span className="hr-funnel-label">{step.stage}</span>
+                      </div>
+                      <div className="hr-funnel-track">
+                        <div
+                          className="hr-funnel-fill"
+                          style={{ width: `${pct}%`, background: step.color }}
+                        />
+                        <span className="hr-funnel-percent">{pct}%</span>
+                      </div>
+                      <span className="hr-funnel-count">{step.count}</span>
                     </div>
-                    <span className="hr-funnel-count">{step.count}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </ChartCard>
 
