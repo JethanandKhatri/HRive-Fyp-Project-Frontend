@@ -82,6 +82,51 @@ export const incomeSlices = [
 
 export const todoItems = ['New Employee intro', 'Schedule product demo', 'Approve travel requests', 'Share salary summary']
 
+export const hrDepartmentStats = [
+  { label: 'Engineering', value: 92, color: '#0d5b6c' },
+  { label: 'Design', value: 76, color: '#1ecac3' },
+  { label: 'Marketing', value: 58, color: '#f4c542' },
+  { label: 'Operations', value: 46, color: '#7ca964' },
+]
+
+export const hrStatusBreakdown = [
+  { label: 'Active', value: 312, color: '#22c55e' },
+  { label: 'Remote', value: 64, color: '#0ea5e9' },
+  { label: 'On Leave', value: 28, color: '#f59e0b' },
+  { label: 'Exit', value: 8, color: '#ef4444' },
+]
+
+export const hrAttendanceStats = [
+  { label: 'On Time', value: 82, color: '#22c55e' },
+  { label: 'Late', value: 11, color: '#f59e0b' },
+  { label: 'Absent', value: 7, color: '#ef4444' },
+]
+
+export const hrApplicants = [
+  { name: 'Irene Velasco', role: 'UI Designer', stage: 'Interview' },
+  { name: 'Olivia James', role: 'HR Analyst', stage: 'Review' },
+  { name: 'Ethan Brooks', role: 'Recruiter', stage: 'Offer' },
+  { name: 'Sophia Patel', role: 'Compensation Lead', stage: 'Screening' },
+]
+
+export const hrEvents = [
+  { title: 'Orientation: New Joiners', time: 'Today - 3:00 PM' },
+  { title: 'Benefits Q&A', time: 'Tomorrow - 11:00 AM' },
+  { title: 'Policy Update Briefing', time: 'Fri - 2:30 PM' },
+]
+
+export const hrActivities = [
+  { title: 'Aaron Lee approved leave request', time: '10 mins ago' },
+  { title: 'Benefits enrollment completed', time: '1 hour ago' },
+  { title: 'New job post published', time: '2 hours ago' },
+]
+
+export const hrBirthdays = [
+  { name: 'Aisha Khan', role: 'People Ops', date: 'Today' },
+  { name: 'Marcus Doyle', role: 'Recruiter', date: 'Tomorrow' },
+  { name: 'Nina Patel', role: 'HR Analyst', date: 'Fri' },
+]
+
 export const navByPortal = {
   hr: [
     { label: 'HR Dashboard', path: '' },

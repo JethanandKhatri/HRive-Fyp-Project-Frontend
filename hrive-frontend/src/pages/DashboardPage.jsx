@@ -21,6 +21,13 @@ import {
   activityPills,
   deepBlue,
   highlight,
+  hrActivities,
+  hrApplicants,
+  hrAttendanceStats,
+  hrBirthdays,
+  hrDepartmentStats,
+  hrEvents,
+  hrStatusBreakdown,
   incomeSlices,
   metrics,
   portalKeys,
@@ -126,6 +133,22 @@ function DashboardPage() {
   const stackData = salaryStacked[portal] ?? []
   const barKeys = stackData.length ? Object.keys(stackData[0]).filter((k) => k !== 'month') : []
   const barPalette = [deepBlue, '#f4c542', highlight]
+  const isHr = portal === 'hr'
+  const hrStatusTotal = hrStatusBreakdown.reduce((sum, item) => sum + item.value, 0)
+  const getInitials = (name) =>
+    name
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase()
+  const stageTone = {
+    Interview: 'tone-blue',
+    Review: 'tone-slate',
+    Offer: 'tone-green',
+    Screening: 'tone-amber',
+  }
   const metricData = (metrics[portal] ?? []).map((m) => {
     if (m.label === 'Total Employee' && employeeStats.total !== null) {
       return { ...m, value: String(employeeStats.total) }
@@ -151,77 +174,210 @@ function DashboardPage() {
         </div>
 
         <div className="chart-row">
-          <ChartCard title="Income Analysis" subtitle="8% higher than last month">
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie data={incomeSlices} dataKey="value" nameKey="name" innerRadius={45} outerRadius={85} paddingAngle={1}>
-                  {incomeSlices.map((slice) => (
-                    <Cell key={slice.name} fill={slice.color} />
+          {isHr ? (
+            <>
+              <ChartCard title="Employee by Department" subtitle="Active headcount">
+                <div className="hr-bar-list">
+                  {hrDepartmentStats.map((dept) => (
+                    <div key={dept.label} className="hr-bar-row">
+                      <span className="hr-bar-label">{dept.label}</span>
+                      <div className="hr-bar-track">
+                        <div className="hr-bar-fill" style={{ width: `${dept.value}%`, background: dept.color }} />
+                      </div>
+                      <span className="hr-bar-value">{dept.value}%</span>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="legend-text">
-              {incomeSlices.map((slice) => (
-                <span key={slice.name}>
-                  <span className="dot" style={{ background: slice.color }} />
-                  {slice.name} {slice.value}%
-                </span>
-              ))}
-            </div>
-          </ChartCard>
-
-          <ChartCard title="Workload / Salary" subtitle="Stacks by month">
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={stackData} barSize={14}>
-                <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Legend />
-                {barKeys.map((key, idx) => (
-                  <Bar key={key} dataKey={key} stackId="salary" fill={barPalette[idx % barPalette.length]} radius={[4, 4, 0, 0]} />
-                ))}
-              </BarChart>
-            </ResponsiveContainer>
-            <div className="pill-row">
-              {activityPills.map((pill) => (
-                <button key={pill} className="pill">
-                  {pill}
-                </button>
-              ))}
-            </div>
-          </ChartCard>
-        </div>
-
-        <div className="bottom-grid">
-          <ChartCard title="Total Salary by Unit" compact>
-            <div className="unit-list">
-              {incomeSlices.map((slice) => (
-                <div key={slice.name} className="unit-row">
-                  <span className="unit-name">{slice.name}</span>
-                  <div className="unit-bar">
-                    <div className="unit-bar-fill" style={{ width: `${slice.value}%`, background: slice.color }} />
-                  </div>
-                  <span className="unit-value">{slice.value}%</span>
                 </div>
-              ))}
-            </div>
-          </ChartCard>
+              </ChartCard>
+              <ChartCard title="Employee Status" subtitle="Current distribution">
+                <div className="hr-status-bar">
+                  {hrStatusBreakdown.map((item) => (
+                    <span
+                      key={item.label}
+                      className="hr-status-seg"
+                      style={{ width: `${(item.value / hrStatusTotal) * 100}%`, background: item.color }}
+                    />
+                  ))}
+                </div>
+                <div className="hr-status-list">
+                  {hrStatusBreakdown.map((item) => (
+                    <div key={item.label} className="hr-status-item">
+                      <span className="hr-dot" style={{ background: item.color }} />
+                      <span className="hr-status-label">{item.label}</span>
+                      <span className="hr-status-value">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </ChartCard>
+            </>
+          ) : (
+            <>
+              <ChartCard title="Income Analysis" subtitle="8% higher than last month">
+                <ResponsiveContainer width="100%" height={240}>
+                  <PieChart>
+                    <Pie data={incomeSlices} dataKey="value" nameKey="name" innerRadius={45} outerRadius={85} paddingAngle={1}>
+                      {incomeSlices.map((slice) => (
+                        <Cell key={slice.name} fill={slice.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend verticalAlign="bottom" height={36} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="legend-text">
+                  {incomeSlices.map((slice) => (
+                    <span key={slice.name}>
+                      <span className="dot" style={{ background: slice.color }} />
+                      {slice.name} {slice.value}%
+                    </span>
+                  ))}
+                </div>
+              </ChartCard>
 
-          <ChartCard title="ToDo List" compact>
-            <ul className="todo-list">
-              {todoItems.map((item) => (
-                <li key={item}>
-                  <input type="checkbox" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </ChartCard>
-
+              <ChartCard title="Workload / Salary" subtitle="Stacks by month">
+                <ResponsiveContainer width="100%" height={240}>
+                  <BarChart data={stackData} barSize={14}>
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} />
+                    <Tooltip />
+                    <Legend />
+                    {barKeys.map((key, idx) => (
+                      <Bar
+                        key={key}
+                        dataKey={key}
+                        stackId="salary"
+                        fill={barPalette[idx % barPalette.length]}
+                        radius={[4, 4, 0, 0]}
+                      />
+                    ))}
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="pill-row">
+                  {activityPills.map((pill) => (
+                    <button key={pill} className="pill">
+                      {pill}
+                    </button>
+                  ))}
+                </div>
+              </ChartCard>
+            </>
+          )}
         </div>
+
+        {isHr ? (
+          <div className="bottom-grid">
+            <ChartCard title="Attendance Overview" compact>
+              <div className="hr-attendance-list">
+                {hrAttendanceStats.map((stat) => (
+                  <div key={stat.label} className="hr-attendance-row">
+                    <span className="hr-attendance-label">
+                      <span className="hr-dot" style={{ background: stat.color }} />
+                      {stat.label}
+                    </span>
+                    <div className="hr-attendance-track">
+                      <div className="hr-attendance-fill" style={{ width: `${stat.value}%`, background: stat.color }} />
+                    </div>
+                    <span className="hr-attendance-value">{stat.value}%</span>
+                  </div>
+                ))}
+              </div>
+            </ChartCard>
+
+            <ChartCard title="ToDo List" compact>
+              <ul className="todo-list">
+                {todoItems.map((item) => (
+                  <li key={item}>
+                    <input type="checkbox" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </ChartCard>
+
+            <ChartCard title="Job Applicants" compact>
+              <ul className="hr-people-list">
+                {hrApplicants.map((applicant) => (
+                  <li key={applicant.name}>
+                    <div className="hr-people-main">
+                      <span className="hr-avatar">{getInitials(applicant.name)}</span>
+                      <div>
+                        <span className="hr-people-name">{applicant.name}</span>
+                        <span className="hr-people-role">{applicant.role}</span>
+                      </div>
+                    </div>
+                    <span className={`hr-people-stage ${stageTone[applicant.stage] ?? ''}`}>{applicant.stage}</span>
+                  </li>
+                ))}
+              </ul>
+            </ChartCard>
+
+            <ChartCard title="Upcoming Events" compact>
+              <ul className="hr-activity-list">
+                {hrEvents.map((event) => (
+                  <li key={event.title}>
+                    <span className="hr-activity-title">{event.title}</span>
+                    <span className="hr-activity-time">{event.time}</span>
+                  </li>
+                ))}
+              </ul>
+            </ChartCard>
+
+            <ChartCard title="Recent Activity" compact>
+              <ul className="hr-activity-list">
+                {hrActivities.map((activity) => (
+                  <li key={activity.title}>
+                    <span className="hr-activity-title">{activity.title}</span>
+                    <span className="hr-activity-time">{activity.time}</span>
+                  </li>
+                ))}
+              </ul>
+            </ChartCard>
+
+            <ChartCard title="Birthdays" compact>
+              <ul className="hr-birthday-list">
+                {hrBirthdays.map((person) => (
+                  <li key={person.name}>
+                    <div className="hr-birthday-main">
+                      <span className="hr-avatar hr-avatar-sun">{getInitials(person.name)}</span>
+                      <div>
+                        <span className="hr-birthday-name">{person.name}</span>
+                        <span className="hr-birthday-role">{person.role}</span>
+                      </div>
+                    </div>
+                    <span className="hr-birthday-date">{person.date}</span>
+                  </li>
+                ))}
+              </ul>
+            </ChartCard>
+          </div>
+        ) : (
+          <div className="bottom-grid">
+            <ChartCard title="Total Salary by Unit" compact>
+              <div className="unit-list">
+                {incomeSlices.map((slice) => (
+                  <div key={slice.name} className="unit-row">
+                    <span className="unit-name">{slice.name}</span>
+                    <div className="unit-bar">
+                      <div className="unit-bar-fill" style={{ width: `${slice.value}%`, background: slice.color }} />
+                    </div>
+                    <span className="unit-value">{slice.value}%</span>
+                  </div>
+                ))}
+              </div>
+            </ChartCard>
+
+            <ChartCard title="ToDo List" compact>
+              <ul className="todo-list">
+                {todoItems.map((item) => (
+                  <li key={item}>
+                    <input type="checkbox" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </ChartCard>
+          </div>
+        )}
       </div>
     </DashboardShell>
   )
