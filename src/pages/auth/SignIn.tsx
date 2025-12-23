@@ -30,7 +30,7 @@ export default function SignIn() {
         </div>
         
         <div className="relative z-10">
-          <HRiveLogo size="lg" className="text-white" />
+          <HRiveLogo size="lg" variant="light" />
         </div>
         
         <div className="relative z-10 space-y-6">

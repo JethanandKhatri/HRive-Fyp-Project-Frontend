@@ -12,13 +12,13 @@
   :root {
     /* HRive Brand Colors - Light Mode */
     --background: 150 20% 97%;
-    --foreground: 203 37% 19%;
+    --foreground: 203 37% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 203 37% 19%;
+    --card-foreground: 203 37% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 203 37% 19%;
+    --popover-foreground: 203 37% 15%;
 
     /* Primary - Deep Teal Forge #366376 */
     --primary: 196 38% 33%;
@@ -26,43 +26,43 @@
 
     /* Secondary - Frosted Mist */
     --secondary: 150 24% 85%;
-    --secondary-foreground: 203 37% 19%;
+    --secondary-foreground: 203 37% 15%;
 
     --muted: 150 20% 92%;
-    --muted-foreground: 203 20% 45%;
+    --muted-foreground: 203 25% 40%;
 
     /* Accent - Growth Leaf / Evergreen */
-    --accent: 158 35% 45%;
+    --accent: 158 35% 40%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 158 50% 42%;
+    --success: 158 50% 38%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 203 37% 10%;
 
     --info: 196 38% 33%;
     --info-foreground: 0 0% 100%;
 
-    --border: 150 20% 88%;
-    --input: 150 20% 88%;
+    --border: 150 20% 85%;
+    --input: 150 20% 85%;
     --ring: 196 38% 33%;
 
     --radius: 0.625rem;
 
     /* Sidebar - Midnight Steel #1E3142 */
     --sidebar-background: 203 37% 19%;
-    --sidebar-foreground: 150 24% 95%;
+    --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 158 50% 42%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 203 35% 25%;
-    --sidebar-accent-foreground: 150 24% 95%;
-    --sidebar-border: 203 35% 25%;
+    --sidebar-accent: 203 35% 28%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 203 35% 28%;
     --sidebar-ring: 158 50% 42%;
-    --sidebar-muted: 150 15% 70%;
+    --sidebar-muted: 200 15% 70%;
 
     /* Gradients - HRive Brand */
     --gradient-primary: linear-gradient(135deg, hsl(158 50% 42%) 0%, hsl(196 38% 33%) 100%);
