@@ -21,14 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -43,6 +35,8 @@ import {
   Edit,
   Trash2,
   UserPlus,
+  Briefcase,
+  User,
 } from "lucide-react";
 
 const teamMembers = [
@@ -119,26 +113,26 @@ export default function Team() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
+        <div className="flex flex-col gap-4 animate-fade-in">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Team & Roles</h1>
-            <p className="text-muted-foreground">Manage hiring team members and permissions</p>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Team & Roles</h1>
+            <p className="text-sm text-muted-foreground">Manage hiring team members and permissions</p>
           </div>
           <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 gradient-primary border-0">
+              <Button className="gap-2 gradient-primary border-0 w-full sm:w-auto">
                 <UserPlus className="h-4 w-4" />
                 Invite Member
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Invite Team Member</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>First Name</Label>
                     <Input placeholder="Enter first name" />
@@ -179,7 +173,7 @@ export default function Team() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => setIsInviteOpen(false)}>
                     Cancel
                   </Button>
@@ -194,146 +188,212 @@ export default function Team() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-primary" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Users className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{teamMembers.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Members</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{teamMembers.length}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Total Members</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-destructive" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+                  <Shield className="h-5 w-5 md:h-6 md:w-6 text-destructive" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{admins}</p>
-                  <p className="text-sm text-muted-foreground">Admins</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{admins}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Admins</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-primary" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Briefcase className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{hiringManagers}</p>
-                  <p className="text-sm text-muted-foreground">Hiring Managers</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{hiringManagers}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Hiring Mgrs</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
-                  <UserPlus className="h-6 w-6 text-accent" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                  <User className="h-5 w-5 md:h-6 md:w-6 text-accent" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{recruiters}</p>
-                  <p className="text-sm text-muted-foreground">Recruiters</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{recruiters}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Recruiters</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Team Members Table */}
+        {/* Team Members - Card Layout for Mobile, Table for Desktop */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Team Members</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Jobs Assigned</TableHead>
-                  <TableHead>Candidates</TableHead>
-                  <TableHead className="w-12"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {teamMembers.map((member) => {
-                  const roleStyle = roleStyles[member.role as keyof typeof roleStyles];
-                  return (
-                    <TableRow key={member.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9">
-                            <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                              {member.name.split(" ").map(n => n[0]).join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-foreground">{member.name}</p>
-                            <p className="text-sm text-muted-foreground">{member.email}</p>
-                          </div>
+            {/* Mobile Card View */}
+            <div className="space-y-4 lg:hidden">
+              {teamMembers.map((member) => {
+                const roleStyle = roleStyles[member.role as keyof typeof roleStyles];
+                return (
+                  <div key={member.id} className="p-4 border rounded-lg">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Avatar className="h-10 w-10 shrink-0">
+                          <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                            {member.name.split(" ").map(n => n[0]).join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0">
+                          <p className="font-medium text-foreground truncate">{member.name}</p>
+                          <p className="text-sm text-muted-foreground truncate">{member.email}</p>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={`${roleStyle.bg} ${roleStyle.text} ${roleStyle.border}`}>
-                          {member.role}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-foreground">{member.department}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={
-                            member.status === "active"
-                              ? "bg-success/10 text-success border-success/20"
-                              : "bg-warning/10 text-warning border-warning/20"
-                          }
-                        >
-                          {member.status === "active" ? "Active" : "Invited"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-foreground">{member.jobsAssigned}</TableCell>
-                      <TableCell className="text-foreground">{member.candidatesManaged}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem className="gap-2">
-                              <Edit className="h-4 w-4" />
-                              Edit Role
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="gap-2 text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                              Remove
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem className="gap-2">
+                            <Edit className="h-4 w-4" />
+                            Edit Role
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="gap-2 text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                            Remove
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className={`${roleStyle.bg} ${roleStyle.text} ${roleStyle.border}`}>
+                        {member.role}
+                      </Badge>
+                      <Badge variant="outline" className="text-foreground">
+                        {member.department}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className={
+                          member.status === "active"
+                            ? "bg-success/10 text-success border-success/20"
+                            : "bg-warning/10 text-warning border-warning/20"
+                        }
+                      >
+                        {member.status === "active" ? "Active" : "Invited"}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 pt-3 border-t flex items-center justify-between text-sm text-muted-foreground">
+                      <span>{member.jobsAssigned} jobs</span>
+                      <span>{member.candidatesManaged} candidates</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Member</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Role</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Department</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Jobs</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Candidates</th>
+                    <th className="w-12 py-3 px-4"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamMembers.map((member) => {
+                    const roleStyle = roleStyles[member.role as keyof typeof roleStyles];
+                    return (
+                      <tr key={member.id} className="border-b last:border-0">
+                        <td className="py-3 px-4">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9">
+                              <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                                {member.name.split(" ").map(n => n[0]).join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-foreground">{member.name}</p>
+                              <p className="text-sm text-muted-foreground">{member.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <Badge variant="outline" className={`${roleStyle.bg} ${roleStyle.text} ${roleStyle.border}`}>
+                            {member.role}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-foreground">{member.department}</td>
+                        <td className="py-3 px-4">
+                          <Badge
+                            variant="outline"
+                            className={
+                              member.status === "active"
+                                ? "bg-success/10 text-success border-success/20"
+                                : "bg-warning/10 text-warning border-warning/20"
+                            }
+                          >
+                            {member.status === "active" ? "Active" : "Invited"}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-foreground">{member.jobsAssigned}</td>
+                        <td className="py-3 px-4 text-foreground">{member.candidatesManaged}</td>
+                        <td className="py-3 px-4">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem className="gap-2">
+                                <Edit className="h-4 w-4" />
+                                Edit Role
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="gap-2 text-destructive">
+                                <Trash2 className="h-4 w-4" />
+                                Remove
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
 
         {/* Role Permissions */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3">
           {Object.entries(rolePermissions).map(([role, permissions]) => {
             const roleStyle = roleStyles[role as keyof typeof roleStyles];
             return (
@@ -350,7 +410,7 @@ export default function Team() {
                   <ul className="space-y-2">
                     {permissions.map((permission) => (
                       <li key={permission} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+                        <div className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
                         {permission}
                       </li>
                     ))}

@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Search, Filter, RefreshCw, Users } from "lucide-react";
+import { Search, RefreshCw, Users } from "lucide-react";
 import { Candidate } from "@/components/ats/CandidateCard";
 
 const mockCandidates: Candidate[] = [
@@ -61,57 +61,63 @@ export default function Pipeline() {
 
   return (
     <MainLayout>
-      <div className="flex flex-col h-[calc(100vh-4rem)]">
+      <div className="flex flex-col h-[calc(100vh-5rem)] md:h-[calc(100vh-4rem)]">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 animate-fade-in">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Candidate Pipeline</h1>
-            <p className="text-muted-foreground">Drag and drop candidates between stages</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search candidates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-64"
-              />
+        <div className="flex flex-col gap-4 mb-4 md:mb-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Candidate Pipeline</h1>
+              <p className="text-sm text-muted-foreground">Drag and drop candidates between stages</p>
             </div>
-            <Select value={selectedJob} onValueChange={setSelectedJob}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by job" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Jobs</SelectItem>
-                <SelectItem value="1">Senior Software Engineer</SelectItem>
-                <SelectItem value="2">UI/UX Designer</SelectItem>
-                <SelectItem value="3">Product Manager</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="icon">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search candidates..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-full sm:w-64"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Select value={selectedJob} onValueChange={setSelectedJob}>
+                  <SelectTrigger className="w-full sm:w-48">
+                    <SelectValue placeholder="Filter by job" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Jobs</SelectItem>
+                    <SelectItem value="1">Senior Software Engineer</SelectItem>
+                    <SelectItem value="2">UI/UX Designer</SelectItem>
+                    <SelectItem value="3">Product Manager</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="icon" className="shrink-0">
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-6 mb-4 p-3 bg-muted/50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">Total: {candidates.length}</span>
-          </div>
-          {stages.slice(0, 5).map((stage) => (
-            <div key={stage.key} className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">{stage.title}:</span>
-              <span className="text-sm font-medium text-foreground">{getCandidatesByStage(stage.key).length}</span>
+        {/* Stats - Horizontal scroll on mobile */}
+        <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-4">
+          <div className="flex items-center gap-4 md:gap-6 p-3 bg-muted/50 rounded-lg min-w-max">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-foreground whitespace-nowrap">Total: {candidates.length}</span>
             </div>
-          ))}
+            {stages.slice(0, 5).map((stage) => (
+              <div key={stage.key} className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground whitespace-nowrap">{stage.title}:</span>
+                <span className="text-sm font-medium text-foreground">{getCandidatesByStage(stage.key).length}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Pipeline Board */}
-        <div className="flex-1 overflow-x-auto pb-4">
-          <div className="flex gap-4 h-full min-w-max">
+        {/* Pipeline Board - Horizontal scroll */}
+        <div className="flex-1 overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 pb-4">
+          <div className="flex gap-3 md:gap-4 h-full min-w-max">
             {stages.map((stage) => (
               <PipelineColumn
                 key={stage.key}

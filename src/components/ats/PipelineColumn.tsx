@@ -42,7 +42,7 @@ export function PipelineColumn({
   return (
     <div
       className={cn(
-        "flex flex-col w-72 min-w-72 bg-muted/30 rounded-lg transition-all",
+        "flex flex-col w-64 md:w-72 min-w-[256px] md:min-w-72 bg-muted/30 rounded-lg transition-all shrink-0",
         isDragOver && "ring-2 ring-primary ring-offset-2"
       )}
       onDragOver={(e) => e.preventDefault()}
@@ -51,10 +51,10 @@ export function PipelineColumn({
       <div className="p-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className={cn("w-2 h-2 rounded-full", bgColor)} />
-            <h3 className="font-semibold text-sm text-foreground">{title}</h3>
+            <div className={cn("w-2 h-2 rounded-full shrink-0", bgColor)} />
+            <h3 className="font-semibold text-sm text-foreground truncate">{title}</h3>
           </div>
-          <Badge variant="secondary" className="text-xs font-medium">
+          <Badge variant="secondary" className="text-xs font-medium shrink-0">
             {candidates.length}
           </Badge>
         </div>

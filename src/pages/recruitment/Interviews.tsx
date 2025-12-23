@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Video, MapPin, Plus, Star, User, Search } from "lucide-react";
+import { Calendar, Clock, Video, MapPin, Plus, Star, User } from "lucide-react";
 
 const upcomingInterviews = [
   {
@@ -104,21 +103,21 @@ export default function Interviews() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
+        <div className="flex flex-col gap-4 animate-fade-in">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Interview Management</h1>
-            <p className="text-muted-foreground">Schedule and track candidate interviews</p>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Interview Management</h1>
+            <p className="text-sm text-muted-foreground">Schedule and track candidate interviews</p>
           </div>
           <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 gradient-primary border-0">
+              <Button className="gap-2 gradient-primary border-0 w-full sm:w-auto">
                 <Plus className="h-4 w-4" />
                 Schedule Interview
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Schedule Interview</DialogTitle>
               </DialogHeader>
@@ -136,7 +135,7 @@ export default function Interviews() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Date</Label>
                     <Input type="date" />
@@ -188,7 +187,7 @@ export default function Interviews() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => setIsScheduleOpen(false)}>
                     Cancel
                   </Button>
@@ -202,11 +201,11 @@ export default function Interviews() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                   <Calendar className="h-6 w-6 text-primary" />
                 </div>
                 <div>
@@ -219,7 +218,7 @@ export default function Interviews() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center shrink-0">
                   <Star className="h-6 w-6 text-success" />
                 </div>
                 <div>
@@ -232,7 +231,7 @@ export default function Interviews() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
                   <User className="h-6 w-6 text-accent" />
                 </div>
                 <div>
@@ -246,19 +245,22 @@ export default function Interviews() {
 
         {/* Interview Tabs */}
         <Tabs defaultValue="upcoming">
-          <TabsList>
-            <TabsTrigger value="upcoming">Upcoming ({upcomingInterviews.length})</TabsTrigger>
-            <TabsTrigger value="completed">Completed ({completedInterviews.length})</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList className="w-max">
+              <TabsTrigger value="upcoming">Upcoming ({upcomingInterviews.length})</TabsTrigger>
+              <TabsTrigger value="completed">Completed ({completedInterviews.length})</TabsTrigger>
+              <TabsTrigger value="calendar">Calendar</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="upcoming" className="mt-4 space-y-4">
             {upcomingInterviews.map((interview) => (
               <Card key={interview.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    {/* Candidate Info */}
                     <div className="flex items-center gap-4">
-                      <Avatar className="h-12 w-12">
+                      <Avatar className="h-12 w-12 shrink-0">
                         <AvatarFallback className="bg-primary/10 text-primary">
                           {interview.candidate.split(" ").map(n => n[0]).join("")}
                         </AvatarFallback>
@@ -268,30 +270,34 @@ export default function Interviews() {
                         <p className="text-sm text-muted-foreground">{interview.role}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
+                    
+                    {/* Interview Details */}
+                    <div className="flex flex-wrap items-center gap-3 lg:gap-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
                         <div className="flex items-center gap-2 text-sm text-foreground">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <Calendar className="h-4 w-4 text-muted-foreground shrink-0" />
                           {interview.date}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Clock className="h-4 w-4" />
+                          <Clock className="h-4 w-4 shrink-0" />
                           {interview.time}
                         </div>
                       </div>
-                      <Badge variant="secondary">{interview.type}</Badge>
-                      <Badge variant="outline" className="gap-1">
-                        {interview.mode === "Video Call" ? (
-                          <Video className="h-3 w-3" />
-                        ) : (
-                          <MapPin className="h-3 w-3" />
-                        )}
-                        {interview.mode}
-                      </Badge>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="secondary">{interview.type}</Badge>
+                        <Badge variant="outline" className="gap-1">
+                          {interview.mode === "Video Call" ? (
+                            <Video className="h-3 w-3" />
+                          ) : (
+                            <MapPin className="h-3 w-3" />
+                          )}
+                          <span className="hidden sm:inline">{interview.mode}</span>
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground hidden md:block">
                         <span className="text-foreground">{interview.interviewer}</span>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="w-full sm:w-auto">
                         Reschedule
                       </Button>
                     </div>
@@ -305,9 +311,10 @@ export default function Interviews() {
             {completedInterviews.map((interview) => (
               <Card key={interview.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                    {/* Candidate Info */}
                     <div className="flex items-center gap-4">
-                      <Avatar className="h-12 w-12">
+                      <Avatar className="h-12 w-12 shrink-0">
                         <AvatarFallback className="bg-primary/10 text-primary">
                           {interview.candidate.split(" ").map(n => n[0]).join("")}
                         </AvatarFallback>
@@ -317,7 +324,9 @@ export default function Interviews() {
                         <p className="text-sm text-muted-foreground">{interview.role}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
+                    
+                    {/* Rating & Actions */}
+                    <div className="flex flex-wrap items-center gap-3 lg:gap-6">
                       <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
@@ -338,11 +347,11 @@ export default function Interviews() {
                             : "bg-destructive/10 text-destructive border-destructive/20"
                         }
                       >
-                        {interview.recommendation === "hire" ? "Recommend Hire" : "Recommend Reject"}
+                        {interview.recommendation === "hire" ? "Recommend Hire" : "Reject"}
                       </Badge>
                       <Dialog open={isFeedbackOpen} onOpenChange={setIsFeedbackOpen}>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" className="w-full sm:w-auto">
                             View Feedback
                           </Button>
                         </DialogTrigger>
@@ -391,9 +400,9 @@ export default function Interviews() {
           <TabsContent value="calendar" className="mt-4">
             <Card>
               <CardContent className="pt-6">
-                <div className="h-96 flex items-center justify-center text-muted-foreground">
+                <div className="h-64 md:h-96 flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
-                    <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
+                    <Calendar className="h-12 md:h-16 w-12 md:w-16 mx-auto mb-4 text-muted-foreground/50" />
                     <p className="font-medium text-foreground">Calendar View</p>
                     <p className="text-sm text-muted-foreground">Coming soon - Full calendar integration</p>
                   </div>

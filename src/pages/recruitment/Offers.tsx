@@ -97,21 +97,21 @@ export default function Offers() {
 
   return (
     <MainLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
+        <div className="flex flex-col gap-4 animate-fade-in">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Offer Management</h1>
-            <p className="text-muted-foreground">Create and track job offers</p>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight text-foreground">Offer Management</h1>
+            <p className="text-sm text-muted-foreground">Create and track job offers</p>
           </div>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 gradient-primary border-0">
+              <Button className="gap-2 gradient-primary border-0 w-full sm:w-auto">
                 <Plus className="h-4 w-4" />
                 Create Offer
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Create Job Offer</DialogTitle>
               </DialogHeader>
@@ -128,7 +128,7 @@ export default function Offers() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Position</Label>
                     <Input placeholder="Job title" />
@@ -148,7 +148,7 @@ export default function Offers() {
                     </Select>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Salary (PKR)</Label>
                     <Input type="number" placeholder="Monthly salary" />
@@ -176,7 +176,7 @@ export default function Offers() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex justify-end gap-2 pt-4">
+                <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
                     Cancel
                   </Button>
@@ -191,55 +191,55 @@ export default function Offers() {
         </div>
 
         {/* Stats */}
-        <div className="grid gap-4 sm:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <FileText className="h-6 w-6 text-primary" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <FileText className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{offers.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Offers</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{offers.length}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Total Offers</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-warning/10 flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-warning" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-warning/10 flex items-center justify-center shrink-0">
+                  <Clock className="h-5 w-5 md:h-6 md:w-6 text-warning" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{pendingOffers.length}</p>
-                  <p className="text-sm text-muted-foreground">Pending</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{pendingOffers.length}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Pending</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-success/10 flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-success" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-success/10 flex items-center justify-center shrink-0">
+                  <CheckCircle className="h-5 w-5 md:h-6 md:w-6 text-success" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{acceptedOffers.length}</p>
-                  <p className="text-sm text-muted-foreground">Accepted</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{acceptedOffers.length}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Accepted</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                  <XCircle className="h-6 w-6 text-destructive" />
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+                  <XCircle className="h-5 w-5 md:h-6 md:w-6 text-destructive" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">{declinedOffers.length}</p>
-                  <p className="text-sm text-muted-foreground">Declined</p>
+                  <p className="text-xl md:text-2xl font-bold text-foreground">{declinedOffers.length}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">Declined</p>
                 </div>
               </div>
             </CardContent>
@@ -248,12 +248,14 @@ export default function Offers() {
 
         {/* Offers Tabs */}
         <Tabs defaultValue="all">
-          <TabsList>
-            <TabsTrigger value="all">All Offers ({offers.length})</TabsTrigger>
-            <TabsTrigger value="pending">Pending ({pendingOffers.length})</TabsTrigger>
-            <TabsTrigger value="accepted">Accepted ({acceptedOffers.length})</TabsTrigger>
-            <TabsTrigger value="declined">Declined ({declinedOffers.length})</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList className="w-max">
+              <TabsTrigger value="all">All ({offers.length})</TabsTrigger>
+              <TabsTrigger value="pending">Pending ({pendingOffers.length})</TabsTrigger>
+              <TabsTrigger value="accepted">Accepted ({acceptedOffers.length})</TabsTrigger>
+              <TabsTrigger value="declined">Declined ({declinedOffers.length})</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="all" className="mt-4">
             <div className="space-y-4">
@@ -298,45 +300,48 @@ function OfferCard({ offer }: { offer: typeof offers[0] }) {
   return (
     <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="pt-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          {/* Candidate Info */}
           <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12">
+            <Avatar className="h-12 w-12 shrink-0">
               <AvatarFallback className="bg-primary/10 text-primary">
                 {offer.candidate.split(" ").map(n => n[0]).join("")}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-semibold text-foreground">{offer.candidate}</h3>
-              <p className="text-sm text-muted-foreground">{offer.role} • {offer.department}</p>
+            <div className="min-w-0">
+              <h3 className="font-semibold text-foreground truncate">{offer.candidate}</h3>
+              <p className="text-sm text-muted-foreground truncate">{offer.role} • {offer.department}</p>
             </div>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="text-right">
+          
+          {/* Offer Details */}
+          <div className="flex flex-wrap items-center gap-3 lg:gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
               <div className="flex items-center gap-2 text-foreground font-semibold">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <DollarSign className="h-4 w-4 text-muted-foreground shrink-0" />
                 {offer.salary}
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
+                <Calendar className="h-4 w-4 shrink-0" />
                 Join: {offer.joiningDate}
               </div>
             </div>
             <Badge variant="outline" className={`${status.bg} ${status.text} ${status.border}`}>
               {status.label}
             </Badge>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-1">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="gap-1 flex-1 sm:flex-none">
                 <Eye className="h-4 w-4" />
-                View
+                <span className="hidden sm:inline">View</span>
               </Button>
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button variant="outline" size="sm" className="gap-1 flex-1 sm:flex-none">
                 <Download className="h-4 w-4" />
-                PDF
+                <span className="hidden sm:inline">PDF</span>
               </Button>
             </div>
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t flex items-center justify-between text-sm text-muted-foreground">
+        <div className="mt-4 pt-4 border-t flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
           <span>Sent: {offer.sentDate}</span>
           {offer.respondedDate && <span>Responded: {offer.respondedDate}</span>}
         </div>

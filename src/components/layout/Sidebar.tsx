@@ -14,9 +14,9 @@ import {
   ChevronRight,
   UserPlus,
   FileText,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import hriveLogo from "@/assets/hrive-logo.png";
@@ -38,20 +38,32 @@ const navigation = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  collapsed: boolean;
+  onCollapsedChange: (collapsed: boolean) => void;
+}
+
+export function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange }: SidebarProps) {
   const location = useLocation();
-  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 h-screen bg-sidebar transition-all duration-300 ease-in-out",
-        collapsed ? "w-[72px]" : "w-64"
+        "fixed left-0 top-0 z-50 h-screen bg-sidebar transition-all duration-300 ease-in-out",
+        // Mobile: slide in/out from left
+        "lg:translate-x-0",
+        isOpen ? "translate-x-0" : "-translate-x-full",
+        // Desktop: respect collapsed state
+        collapsed ? "lg:w-[72px]" : "lg:w-64",
+        // Mobile: always full width when open
+        "w-64"
       )}
     >
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-        <Link to="/" className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-3" onClick={onClose}>
           <img
             src={hriveLogo}
             alt="HRive"
@@ -64,11 +76,23 @@ export function Sidebar() {
             </div>
           )}
         </Link>
+        
+        {/* Mobile close button */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setCollapsed(!collapsed)}
-          className="h-8 w-8 text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent"
+          onClick={onClose}
+          className="h-8 w-8 text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent lg:hidden"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+        
+        {/* Desktop collapse button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onCollapsedChange(!collapsed)}
+          className="h-8 w-8 text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent hidden lg:flex"
         >
           {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
@@ -84,6 +108,7 @@ export function Sidebar() {
             <Link
               key={item.name}
               to={item.href}
+              onClick={onClose}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 isActive
@@ -91,8 +116,8 @@ export function Sidebar() {
                   : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
               )}
             >
-              <item.icon className={cn("h-5 w-5 shrink-0", collapsed && "mx-auto")} />
-              {!collapsed && <span>{item.name}</span>}
+              <item.icon className={cn("h-5 w-5 shrink-0", collapsed && "lg:mx-auto")} />
+              <span className={cn(collapsed && "lg:hidden")}>{item.name}</span>
             </Link>
           );
 
@@ -100,7 +125,7 @@ export function Sidebar() {
             return (
               <Tooltip key={item.name} delayDuration={0}>
                 <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                <TooltipContent side="right" className="font-medium">
+                <TooltipContent side="right" className="font-medium hidden lg:block">
                   {item.name}
                 </TooltipContent>
               </Tooltip>
