@@ -12,15 +12,22 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  UserPlus,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import hriveLogo from "@/assets/hrive-logo.png";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Recruitment", href: "/recruitment", icon: Briefcase },
+  { name: "Pipeline", href: "/recruitment/pipeline", icon: Users },
+  { name: "Interviews", href: "/recruitment/interviews", icon: Calendar },
+  { name: "Offers", href: "/recruitment/offers", icon: FileText },
+  { name: "Team", href: "/recruitment/team", icon: UserPlus },
   { name: "Core HR", href: "/core-hr", icon: Users },
   { name: "Attendance", href: "/attendance", icon: Clock },
   { name: "Leave", href: "/leave", icon: Calendar },
@@ -45,11 +52,16 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
         <Link to="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-primary">
-            <span className="text-lg font-bold text-sidebar-primary-foreground">H</span>
-          </div>
+          <img
+            src={hriveLogo}
+            alt="HRive"
+            className="h-9 w-9 object-contain"
+          />
           {!collapsed && (
-            <span className="text-xl font-bold text-sidebar-foreground">HRive</span>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-sidebar-foreground">HRive</span>
+              <span className="text-[10px] text-sidebar-muted -mt-0.5">AI-Driven HR</span>
+            </div>
           )}
         </Link>
         <Button
@@ -63,7 +75,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex flex-col gap-1 p-3">
+      <nav className="flex flex-col gap-1 p-3 overflow-y-auto max-h-[calc(100vh-8rem)]">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href || 
             (item.href !== "/" && location.pathname.startsWith(item.href));
