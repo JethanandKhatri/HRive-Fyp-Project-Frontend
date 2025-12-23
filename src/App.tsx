@@ -16,6 +16,10 @@ import Analytics from "./pages/Analytics";
 import AskHR from "./pages/AskHR";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import SelectRole from "./pages/auth/SelectRole";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +30,13 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Auth Routes */}
+          <Route path="/auth/signin" element={<SignIn />} />
+          <Route path="/auth/signup" element={<SignUp />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/select-role" element={<SelectRole />} />
+          
+          {/* App Routes */}
           <Route path="/" element={<Dashboard />} />
           <Route path="/recruitment" element={<Recruitment />} />
           <Route path="/recruitment/new-job" element={<CreateJob />} />
