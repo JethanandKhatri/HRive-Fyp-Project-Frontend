@@ -26,7 +26,7 @@ export function EmployeeLayout({ children }: EmployeeLayoutProps) {
           collapsed ? "lg:pl-[72px]" : "lg:pl-64"
         )}
       >
-        <TopBar onMenuClick={() => setSidebarOpen(true)} />
+        <TopBar onMenuClick={() => setSidebarOpen(true)} sidebarCollapsed={collapsed} />
         <main className="p-6">{children}</main>
       </div>
 

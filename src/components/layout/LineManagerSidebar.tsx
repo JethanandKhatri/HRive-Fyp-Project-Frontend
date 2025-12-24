@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { HRiveLogo } from "@/components/HRiveLogo";
@@ -12,7 +11,6 @@ import {
   MessageCircle,
   Settings,
   ChevronLeft,
-  ArrowLeftRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -129,19 +127,15 @@ export function LineManagerSidebar({ isOpen, onClose, collapsed, onCollapsedChan
         </ul>
       </nav>
 
-      {/* Portal Switcher */}
-      <div className="p-4 border-t border-border">
-        <Link
-          to="/"
-          className={cn(
-            "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors",
-            collapsed && "justify-center"
-          )}
-        >
-          <ArrowLeftRight className="w-4 h-4 flex-shrink-0" />
-          {!collapsed && <span>Switch to HR Portal</span>}
-        </Link>
-      </div>
+      {/* User Badge */}
+      {!collapsed && (
+        <div className="p-4 border-t border-border">
+          <div className="rounded-lg bg-accent/10 p-3 border border-accent/20">
+            <p className="text-xs font-medium text-muted-foreground">Logged in as</p>
+            <p className="text-sm font-semibold text-accent">Line Manager</p>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

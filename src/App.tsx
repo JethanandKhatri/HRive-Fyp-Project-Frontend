@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 
 // Main Pages
 import Dashboard from "./pages/Dashboard";
@@ -21,9 +22,6 @@ import NotFound from "./pages/NotFound";
 
 // Auth Pages
 import SignIn from "./pages/auth/SignIn";
-import SignUp from "./pages/auth/SignUp";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import SelectRole from "./pages/auth/SelectRole";
 
 // ATS Pages
 import Pipeline from "./pages/recruitment/Pipeline";
@@ -52,6 +50,15 @@ import TeamInsights from "./pages/manager/TeamInsights";
 import ManagerAskHR from "./pages/manager/ManagerAskHR";
 import ManagerSettings from "./pages/manager/ManagerSettings";
 
+// Employee Pages
+import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
+import EmployeeAttendance from "./pages/employee/EmployeeAttendance";
+import EmployeeLeave from "./pages/employee/EmployeeLeave";
+import EmployeePayslips from "./pages/employee/EmployeePayslips";
+import EmployeeAnnouncements from "./pages/employee/EmployeeAnnouncements";
+import EmployeeAskHR from "./pages/employee/EmployeeAskHR";
+import EmployeeSettings from "./pages/employee/EmployeeSettings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -60,57 +67,65 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Auth Routes */}
-          <Route path="/auth/signin" element={<SignIn />} />
-          <Route path="/auth/signup" element={<SignUp />} />
-          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-          <Route path="/auth/select-role" element={<SelectRole />} />
-          
-          {/* Main App Routes */}
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/core-hr" element={<CoreHR />} />
-          <Route path="/attendance" element={<Attendance />} />
-          <Route path="/leave" element={<Leave />} />
-          <Route path="/payroll" element={<Payroll />} />
-          <Route path="/cognitive-ai" element={<CognitiveAI />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/ask-hr" element={<AskHR />} />
-          <Route path="/settings" element={<Settings />} />
-          
-          {/* Recruitment / ATS Routes */}
-          <Route path="/recruitment" element={<Recruitment />} />
-          <Route path="/recruitment/new-job" element={<CreateJob />} />
-          <Route path="/recruitment/job/:jobId" element={<JobDetail />} />
-          <Route path="/recruitment/job/:jobId/applicants" element={<Applicants />} />
-          <Route path="/recruitment/pipeline" element={<Pipeline />} />
-          <Route path="/recruitment/interviews" element={<Interviews />} />
-          <Route path="/recruitment/offers" element={<Offers />} />
-          <Route path="/recruitment/team" element={<Team />} />
-          
-          {/* Admin Portal Routes */}
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/organization" element={<Organization />} />
-          <Route path="/admin/users" element={<UserManagement />} />
-          <Route path="/admin/roles" element={<RolesPermissions />} />
-          <Route path="/admin/modules" element={<Modules />} />
-          <Route path="/admin/compliance" element={<Compliance />} />
-          <Route path="/admin/audit-logs" element={<AuditLogs />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-          
-          {/* Line Manager Portal Routes */}
-          <Route path="/manager" element={<ManagerDashboard />} />
-          <Route path="/manager/team" element={<MyTeam />} />
-          <Route path="/manager/attendance" element={<TeamAttendance />} />
-          <Route path="/manager/leave" element={<LeaveApprovals />} />
-          <Route path="/manager/interviews" element={<ManagerInterviews />} />
-          <Route path="/manager/insights" element={<TeamInsights />} />
-          <Route path="/manager/ask-hr" element={<ManagerAskHR />} />
-          <Route path="/manager/settings" element={<ManagerSettings />} />
-          
-          {/* 404 */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Auth Routes */}
+            <Route path="/auth/signin" element={<SignIn />} />
+            
+            {/* HR Manager Portal Routes */}
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/core-hr" element={<CoreHR />} />
+            <Route path="/attendance" element={<Attendance />} />
+            <Route path="/leave" element={<Leave />} />
+            <Route path="/payroll" element={<Payroll />} />
+            <Route path="/cognitive-ai" element={<CognitiveAI />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/ask-hr" element={<AskHR />} />
+            <Route path="/settings" element={<Settings />} />
+            
+            {/* Recruitment / ATS Routes */}
+            <Route path="/recruitment" element={<Recruitment />} />
+            <Route path="/recruitment/new-job" element={<CreateJob />} />
+            <Route path="/recruitment/job/:jobId" element={<JobDetail />} />
+            <Route path="/recruitment/job/:jobId/applicants" element={<Applicants />} />
+            <Route path="/recruitment/pipeline" element={<Pipeline />} />
+            <Route path="/recruitment/interviews" element={<Interviews />} />
+            <Route path="/recruitment/offers" element={<Offers />} />
+            <Route path="/recruitment/team" element={<Team />} />
+            
+            {/* Admin Portal Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/organization" element={<Organization />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+            <Route path="/admin/roles" element={<RolesPermissions />} />
+            <Route path="/admin/modules" element={<Modules />} />
+            <Route path="/admin/compliance" element={<Compliance />} />
+            <Route path="/admin/audit-logs" element={<AuditLogs />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            
+            {/* Line Manager Portal Routes */}
+            <Route path="/manager" element={<ManagerDashboard />} />
+            <Route path="/manager/team" element={<MyTeam />} />
+            <Route path="/manager/attendance" element={<TeamAttendance />} />
+            <Route path="/manager/leave" element={<LeaveApprovals />} />
+            <Route path="/manager/interviews" element={<ManagerInterviews />} />
+            <Route path="/manager/insights" element={<TeamInsights />} />
+            <Route path="/manager/ask-hr" element={<ManagerAskHR />} />
+            <Route path="/manager/settings" element={<ManagerSettings />} />
+            
+            {/* Employee Portal Routes */}
+            <Route path="/employee" element={<EmployeeDashboard />} />
+            <Route path="/employee/attendance" element={<EmployeeAttendance />} />
+            <Route path="/employee/leave" element={<EmployeeLeave />} />
+            <Route path="/employee/payslips" element={<EmployeePayslips />} />
+            <Route path="/employee/announcements" element={<EmployeeAnnouncements />} />
+            <Route path="/employee/ask-hr" element={<EmployeeAskHR />} />
+            <Route path="/employee/settings" element={<EmployeeSettings />} />
+            
+            {/* 404 */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
