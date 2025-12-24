@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 
 type AppRole = "admin" | "hr_manager" | "line_manager" | "employee";
 
@@ -10,7 +9,6 @@ interface AuthContextType {
   session: Session | null;
   role: AppRole | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -25,28 +23,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
 
         // Defer role fetching to avoid deadlock
-        if (session?.user) {
+        if (currentSession?.user) {
           setTimeout(() => {
-            fetchUserRole(session.user.id);
+            fetchUserRole(currentSession.user.id);
           }, 0);
         } else {
           setRole(null);
+          setLoading(false);
         }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
       
-      if (session?.user) {
-        fetchUserRole(session.user.id);
+      if (existingSession?.user) {
+        fetchUserRole(existingSession.user.id);
       } else {
         setLoading(false);
       }
@@ -77,23 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { error };
-      }
-
-      return { error: null };
-    } catch (err) {
-      return { error: err as Error };
-    }
-  };
-
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -102,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
@@ -116,30 +98,17 @@ export function useAuth() {
   return context;
 }
 
-// Helper hook for role-based redirect
-export function useRoleRedirect() {
-  const { role, loading, user } = useAuth();
-  const navigate = useNavigate();
-
-  const getRedirectPath = (userRole: AppRole | null): string => {
-    switch (userRole) {
-      case "admin":
-        return "/admin";
-      case "hr_manager":
-        return "/";
-      case "line_manager":
-        return "/manager";
-      case "employee":
-        return "/employee";
-      default:
-        return "/auth/signin";
-    }
-  };
-
-  const redirectToPortal = () => {
-    const path = getRedirectPath(role);
-    navigate(path, { replace: true });
-  };
-
-  return { role, loading, user, redirectToPortal, getRedirectPath };
+export function getRedirectPath(userRole: AppRole | null): string {
+  switch (userRole) {
+    case "admin":
+      return "/admin";
+    case "hr_manager":
+      return "/";
+    case "line_manager":
+      return "/manager";
+    case "employee":
+      return "/employee";
+    default:
+      return "/auth/signin";
+  }
 }
