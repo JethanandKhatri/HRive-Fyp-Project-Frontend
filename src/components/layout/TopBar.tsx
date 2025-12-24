@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface TopBarProps {
@@ -33,7 +32,7 @@ export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
           variant="ghost"
           size="icon"
           onClick={onMenuClick}
-          className="lg:hidden shrink-0"
+          className="lg:hidden shrink-0 text-foreground"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -42,41 +41,42 @@ export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search employees, jobs, reports..."
-            className="h-10 pl-10 bg-secondary border-0 focus-visible:ring-1 focus-visible:ring-primary"
+            className="h-10 pl-10 bg-muted/50 border-border focus-visible:ring-1 focus-visible:ring-primary text-foreground placeholder:text-muted-foreground"
           />
         </div>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-2 md:gap-4">
+      <div className="flex items-center gap-2 md:gap-3">
         {/* Mobile search */}
-        <Button variant="ghost" size="icon" className="sm:hidden">
-          <Search className="h-5 w-5 text-muted-foreground" />
+        <Button variant="ghost" size="icon" className="sm:hidden text-foreground">
+          <Search className="h-5 w-5" />
         </Button>
         
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5 text-muted-foreground" />
-              <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 text-xs gradient-primary border-0">
+            <Button variant="ghost" size="icon" className="relative text-foreground hover:bg-muted">
+              <Bell className="h-5 w-5" />
+              {/* Notification Badge - Properly positioned and sized */}
+              <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
                 3
-              </Badge>
+              </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
-              <span className="font-medium">New leave request</span>
+          <DropdownMenuContent align="end" className="w-80 bg-card border-border">
+            <DropdownMenuLabel className="text-foreground font-semibold">Notifications</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem className="flex flex-col items-start gap-1 py-3 cursor-pointer hover:bg-muted">
+              <span className="font-medium text-foreground">New leave request</span>
               <span className="text-xs text-muted-foreground">Ahmed Khan requested 3 days leave</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
-              <span className="font-medium">Interview scheduled</span>
+            <DropdownMenuItem className="flex flex-col items-start gap-1 py-3 cursor-pointer hover:bg-muted">
+              <span className="font-medium text-foreground">Interview scheduled</span>
               <span className="text-xs text-muted-foreground">Technical interview for Senior Developer</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex flex-col items-start gap-1 py-3">
-              <span className="font-medium">Payroll reminder</span>
+            <DropdownMenuItem className="flex flex-col items-start gap-1 py-3 cursor-pointer hover:bg-muted">
+              <span className="font-medium text-foreground">Payroll reminder</span>
               <span className="text-xs text-muted-foreground">December payroll due in 3 days</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -85,10 +85,10 @@ export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 px-2">
-              <Avatar className="h-8 w-8">
+            <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
+              <Avatar className="h-8 w-8 border-2 border-primary/20">
                 <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" />
-                <AvatarFallback>SM</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-medium">SM</AvatarFallback>
               </Avatar>
               <div className="hidden flex-col items-start text-left md:flex">
                 <span className="text-sm font-medium text-foreground">Sarah Malik</span>
@@ -97,13 +97,13 @@ export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
               <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem>Preferences</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-56 bg-card border-border">
+            <DropdownMenuLabel className="text-foreground font-semibold">My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem className="text-foreground cursor-pointer hover:bg-muted">Profile Settings</DropdownMenuItem>
+            <DropdownMenuItem className="text-foreground cursor-pointer hover:bg-muted">Preferences</DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-border" />
+            <DropdownMenuItem className="text-destructive cursor-pointer hover:bg-destructive/10">Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

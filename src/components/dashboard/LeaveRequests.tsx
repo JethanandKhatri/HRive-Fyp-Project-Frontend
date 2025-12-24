@@ -37,13 +37,13 @@ const leaveRequests = [
 
 export function LeaveRequests() {
   return (
-    <Card className="shadow-md animate-slide-up" style={{ animationDelay: "200ms" }}>
+    <Card className="shadow-md animate-slide-up border-border" style={{ animationDelay: "200ms" }}>
       <CardHeader className="flex flex-row items-center justify-between pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
           <Calendar className="h-5 w-5 text-primary" />
           Pending Leave Requests
         </CardTitle>
-        <Badge variant="secondary" className="font-medium">
+        <Badge className="bg-warning/10 text-warning border border-warning/30 font-semibold">
           {leaveRequests.length} pending
         </Badge>
       </CardHeader>
@@ -51,15 +51,17 @@ export function LeaveRequests() {
         {leaveRequests.map((request) => (
           <div
             key={request.id}
-            className="flex items-center justify-between rounded-lg border border-border bg-secondary/30 p-3 transition-colors hover:bg-secondary/50"
+            className="flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted/50"
           >
             <div className="flex items-center gap-3">
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-10 w-10 border border-border">
                 <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${request.avatar}`} />
-                <AvatarFallback>{request.name.split(" ").map((n) => n[0]).join("")}</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                  {request.name.split(" ").map((n) => n[0]).join("")}
+                </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{request.name}</p>
+                <p className="font-medium text-foreground">{request.name}</p>
                 <p className="text-xs text-muted-foreground">
                   {request.type} • {request.dates} ({request.days} {request.days === 1 ? "day" : "days"})
                 </p>
@@ -77,7 +79,7 @@ export function LeaveRequests() {
         ))}
 
         <Link to="/leave">
-          <Button variant="ghost" className="w-full mt-2 text-primary hover:text-primary">
+          <Button variant="ghost" className="w-full mt-2 text-primary hover:text-primary hover:bg-primary/10 font-medium">
             View All Requests
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>

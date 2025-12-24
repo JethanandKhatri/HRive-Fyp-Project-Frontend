@@ -51,9 +51,9 @@ const activities = [
 
 export function RecentActivity() {
   return (
-    <Card className="shadow-md animate-slide-up" style={{ animationDelay: "500ms" }}>
+    <Card className="shadow-md animate-slide-up border-border" style={{ animationDelay: "500ms" }}>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
           <Activity className="h-5 w-5 text-primary" />
           Recent Activity
         </CardTitle>
@@ -63,17 +63,17 @@ export function RecentActivity() {
           {/* Timeline line */}
           <div className="absolute bottom-0 left-5 top-0 w-px bg-border" />
 
-          {activities.map((activity, index) => (
+          {activities.map((activity) => (
             <div key={activity.id} className="relative flex gap-4">
               <div
-                className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${activity.bg}`}
+                className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${activity.bg} border border-border`}
               >
                 <activity.icon className={`h-4 w-4 ${activity.color}`} />
               </div>
               <div className="flex-1 pb-4">
-                <p className="font-medium">{activity.title}</p>
+                <p className="font-semibold text-foreground">{activity.title}</p>
                 <p className="text-sm text-muted-foreground">{activity.description}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{activity.time}</p>
+                <p className="mt-1 text-xs font-medium text-muted-foreground">{activity.time}</p>
               </div>
             </div>
           ))}

@@ -13,8 +13,8 @@ const Dashboard = () => {
       <div className="space-y-6">
         {/* Page Header */}
         <div className="animate-fade-in">
-          <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, Sarah. Here's your workforce overview.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Welcome back, Sarah. Here's your workforce overview.</p>
         </div>
 
         {/* KPI Cards */}

@@ -50,9 +50,9 @@ const typeStyles = {
 
 export function CognitiveInsights() {
   return (
-    <Card className="shadow-md animate-slide-up" style={{ animationDelay: "300ms" }}>
+    <Card className="shadow-md animate-slide-up border-border" style={{ animationDelay: "300ms" }}>
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+        <CardTitle className="flex items-center gap-2 text-lg font-semibold text-foreground">
           <Brain className="h-5 w-5 text-accent" />
           Cognitive AI Insights
         </CardTitle>
@@ -72,9 +72,9 @@ export function CognitiveInsights() {
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="flex-1 space-y-1">
-                  <p className="font-medium">{insight.title}</p>
+                  <p className="font-semibold text-foreground">{insight.title}</p>
                   <p className="text-sm text-muted-foreground">{insight.description}</p>
-                  <p className="text-xs font-medium text-primary">{insight.action}</p>
+                  <p className="text-xs font-semibold text-primary">{insight.action}</p>
                 </div>
               </div>
             </div>
@@ -82,7 +82,7 @@ export function CognitiveInsights() {
         })}
 
         <Link to="/cognitive-ai">
-          <Button variant="ghost" className="w-full mt-2 text-accent hover:text-accent">
+          <Button variant="ghost" className="w-full mt-2 text-accent hover:text-accent hover:bg-accent/10 font-medium">
             View Full Analysis
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
