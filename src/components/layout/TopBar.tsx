@@ -1,4 +1,4 @@
-import { Bell, Search, ChevronDown, Menu } from "lucide-react";
+import { Bell, Search, ChevronDown, Menu, LogOut, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,6 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface TopBarProps {
   onMenuClick: () => void;
@@ -18,6 +21,38 @@ interface TopBarProps {
 }
 
 export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
+  const { user, role, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      navigate("/auth/signin", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Failed to log out");
+    }
+  };
+
+  // Get display name from user metadata or email
+  const displayName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User";
+  const initials = displayName
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
+  // Format role for display
+  const formatRole = (r: string | null) => {
+    if (!r) return "User";
+    return r
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <header 
       className={cn(
@@ -87,12 +122,12 @@ export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted">
               <Avatar className="h-8 w-8 border-2 border-primary/20">
-                <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium">SM</AvatarFallback>
+                <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${displayName}`} />
+                <AvatarFallback className="bg-primary/10 text-primary font-medium">{initials}</AvatarFallback>
               </Avatar>
               <div className="hidden flex-col items-start text-left md:flex">
-                <span className="text-sm font-medium text-foreground">Sarah Malik</span>
-                <span className="text-xs text-muted-foreground">HR Manager</span>
+                <span className="text-sm font-medium text-foreground">{displayName}</span>
+                <span className="text-xs text-muted-foreground">{formatRole(role)}</span>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
             </Button>
@@ -100,10 +135,18 @@ export function TopBar({ onMenuClick, sidebarCollapsed }: TopBarProps) {
           <DropdownMenuContent align="end" className="w-56 bg-card border-border">
             <DropdownMenuLabel className="text-foreground font-semibold">My Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="text-foreground cursor-pointer hover:bg-muted">Profile Settings</DropdownMenuItem>
-            <DropdownMenuItem className="text-foreground cursor-pointer hover:bg-muted">Preferences</DropdownMenuItem>
+            <DropdownMenuItem className="text-foreground cursor-pointer hover:bg-muted gap-2">
+              <User className="h-4 w-4" />
+              Profile Settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border" />
-            <DropdownMenuItem className="text-destructive cursor-pointer hover:bg-destructive/10">Log out</DropdownMenuItem>
+            <DropdownMenuItem 
+              className="text-destructive cursor-pointer hover:bg-destructive/10 gap-2"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Log out
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

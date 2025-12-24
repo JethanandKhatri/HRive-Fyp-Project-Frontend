@@ -6,6 +6,7 @@ import { CognitiveInsights } from "@/components/dashboard/CognitiveInsights";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { Users, Briefcase, Clock, Wallet } from "lucide-react";
+import { AttendanceCheckIn } from "@/components/attendance/AttendanceCheckIn";
 
 const Dashboard = () => {
   return (
@@ -17,8 +18,11 @@ const Dashboard = () => {
           <p className="text-muted-foreground mt-1">Welcome back, Sarah. Here's your workforce overview.</p>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Attendance + KPI Cards */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {/* Personal Attendance Check-In */}
+          <AttendanceCheckIn />
+          
           <StatCard
             title="Total Employees"
             value="162"

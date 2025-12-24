@@ -16,12 +16,12 @@ import {
   ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { AttendanceCheckIn } from "@/components/attendance/AttendanceCheckIn";
 
 const stats = [
   { name: "Team Size", value: "12", icon: Users, color: "text-primary" },
   { name: "Today's Attendance", value: "92%", icon: Calendar, color: "text-accent" },
-  { name: "Pending Leave Requests", value: "3", icon: ClipboardCheck, color: "text-warning" },
-  { name: "Interviews Assigned", value: "2", icon: Video, color: "text-secondary-foreground" },
+  { name: "Pending Requests", value: "3", icon: ClipboardCheck, color: "text-warning" },
 ];
 
 const pendingActions = [
@@ -49,8 +49,12 @@ export default function ManagerDashboard() {
           <p className="text-muted-foreground mt-1">Here's your team overview for today</p>
         </div>
 
-        {/* Stats Grid */}
+        {/* Your Attendance + Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Personal Check-In Card */}
+          <AttendanceCheckIn />
+
+          {/* Stats Cards */}
           {stats.map((stat) => (
             <Card key={stat.name} className="border-border">
               <CardContent className="p-6">

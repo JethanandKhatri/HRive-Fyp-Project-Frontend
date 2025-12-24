@@ -15,15 +15,9 @@ import {
   AlertCircle,
   FileCheck,
 } from "lucide-react";
+import { AttendanceCheckIn } from "@/components/attendance/AttendanceCheckIn";
 
 const kpiCards = [
-  {
-    title: "Today's Status",
-    value: "Checked In",
-    subtitle: "09:02 AM",
-    icon: Clock,
-    variant: "success" as const,
-  },
   {
     title: "Leave Balance",
     value: "18 days",
@@ -48,7 +42,6 @@ const kpiCards = [
 ];
 
 const quickActions = [
-  { label: "Check Out", icon: LogOut, variant: "default" as const },
   { label: "Request Leave", icon: Calendar, variant: "outline" as const },
   { label: "View Payslip", icon: FileText, variant: "outline" as const },
   { label: "Ask HR", icon: MessageCircle, variant: "outline" as const },
@@ -95,8 +88,14 @@ export default function EmployeeDashboard() {
           <p className="text-muted-foreground">Here's your daily overview</p>
         </div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Main Grid: Attendance + KPIs */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Attendance Check-In Card */}
+          <div className="lg:col-span-1">
+            <AttendanceCheckIn />
+          </div>
+
+          {/* KPI Cards */}
           {kpiCards.map((card) => (
             <Card key={card.title} className="shadow-card hover:shadow-card-hover transition-shadow">
               <CardContent className="p-5">
@@ -108,9 +107,7 @@ export default function EmployeeDashboard() {
                   </div>
                   <div
                     className={`p-2.5 rounded-xl ${
-                      card.variant === "success"
-                        ? "bg-success/10 text-success"
-                        : card.variant === "info"
+                      card.variant === "info"
                         ? "bg-info/10 text-info"
                         : card.variant === "warning"
                         ? "bg-warning/10 text-warning"
