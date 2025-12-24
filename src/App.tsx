@@ -32,6 +32,16 @@ import Interviews from "./pages/recruitment/Interviews";
 import Offers from "./pages/recruitment/Offers";
 import Team from "./pages/recruitment/Team";
 
+// Admin Pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import Organization from "./pages/admin/Organization";
+import UserManagement from "./pages/admin/UserManagement";
+import RolesPermissions from "./pages/admin/RolesPermissions";
+import Modules from "./pages/admin/Modules";
+import Compliance from "./pages/admin/Compliance";
+import AuditLogs from "./pages/admin/AuditLogs";
+import AdminSettings from "./pages/admin/AdminSettings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -67,6 +77,16 @@ const App = () => (
           <Route path="/recruitment/interviews" element={<Interviews />} />
           <Route path="/recruitment/offers" element={<Offers />} />
           <Route path="/recruitment/team" element={<Team />} />
+          
+          {/* Admin Portal Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/organization" element={<Organization />} />
+          <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin/roles" element={<RolesPermissions />} />
+          <Route path="/admin/modules" element={<Modules />} />
+          <Route path="/admin/compliance" element={<Compliance />} />
+          <Route path="/admin/audit-logs" element={<AuditLogs />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
           
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
