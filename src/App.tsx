@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 
 // Auth Pages
 import SignIn from "./pages/auth/SignIn";
+import SeedUsers from "./pages/auth/SeedUsers";
 
 // ATS Pages
 import Pipeline from "./pages/recruitment/Pipeline";
@@ -69,6 +70,7 @@ const App = () => (
         <Routes>
           {/* Auth Routes */}
           <Route path="/auth/signin" element={<SignIn />} />
+          <Route path="/auth/seed" element={<SeedUsers />} />
           
           {/* HR Manager Portal Routes */}
           <Route path="/" element={<Dashboard />} />
