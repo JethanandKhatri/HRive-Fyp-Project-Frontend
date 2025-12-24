@@ -42,6 +42,16 @@ import Compliance from "./pages/admin/Compliance";
 import AuditLogs from "./pages/admin/AuditLogs";
 import AdminSettings from "./pages/admin/AdminSettings";
 
+// Line Manager Pages
+import ManagerDashboard from "./pages/manager/ManagerDashboard";
+import MyTeam from "./pages/manager/MyTeam";
+import TeamAttendance from "./pages/manager/TeamAttendance";
+import LeaveApprovals from "./pages/manager/LeaveApprovals";
+import ManagerInterviews from "./pages/manager/ManagerInterviews";
+import TeamInsights from "./pages/manager/TeamInsights";
+import ManagerAskHR from "./pages/manager/ManagerAskHR";
+import ManagerSettings from "./pages/manager/ManagerSettings";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -87,6 +97,16 @@ const App = () => (
           <Route path="/admin/compliance" element={<Compliance />} />
           <Route path="/admin/audit-logs" element={<AuditLogs />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          
+          {/* Line Manager Portal Routes */}
+          <Route path="/manager" element={<ManagerDashboard />} />
+          <Route path="/manager/team" element={<MyTeam />} />
+          <Route path="/manager/attendance" element={<TeamAttendance />} />
+          <Route path="/manager/leave" element={<LeaveApprovals />} />
+          <Route path="/manager/interviews" element={<ManagerInterviews />} />
+          <Route path="/manager/insights" element={<TeamInsights />} />
+          <Route path="/manager/ask-hr" element={<ManagerAskHR />} />
+          <Route path="/manager/settings" element={<ManagerSettings />} />
           
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
