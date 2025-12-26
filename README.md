@@ -1,4 +1,4 @@
-# HRive Frontend
+﻿# HRive Frontend
 
 ## Project info
 
@@ -43,7 +43,6 @@ npm run dev
 This project is built with:
 
 - Vite
-- TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
@@ -51,3 +50,7 @@ This project is built with:
 ## Deployment
 
 Build the app and deploy the `dist` folder to your hosting provider.
+
+Employee
+no@gmail.com
+bafcd681dbff

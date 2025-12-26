@@ -17,7 +17,7 @@ export function ProtectedRoute({ children, allowedRoles }) {
   }
 
   if (!user) {
-    return <Navigate to="/auth/signin" state={{ from: location }} replace />;
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   if (role && !allowedRoles.includes(role)) {
@@ -32,15 +32,15 @@ export function ProtectedRoute({ children, allowedRoles }) {
 function getPortalPath(role) {
   switch (role) {
     case "admin":
-      return "/admin";
+      return "/dashboard";
     case "hr_manager":
-      return "/";
+      return "/hr/dashboard";
     case "line_manager":
       return "/manager";
     case "employee":
       return "/employee";
     default:
-      return "/auth/signin";
+      return "/auth/login";
   }
 }
 

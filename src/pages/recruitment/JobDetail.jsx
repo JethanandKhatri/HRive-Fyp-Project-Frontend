@@ -73,7 +73,7 @@ export default function JobDetail() {
         {/* Back Button & Header */}
         <div className="flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-4">
-            <Link to="/recruitment">
+            <Link to="/hr/recruitment">
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -100,7 +100,7 @@ export default function JobDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link to={`/recruitment/job/${id}/applicants`}>
+            <Link to={`/hr/recruitment/job/${id}/applicants`}>
               <Button variant="outline" className="gap-2">
                 <Eye className="h-4 w-4" />
                 View Applicants

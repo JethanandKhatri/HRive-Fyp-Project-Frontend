@@ -20,7 +20,7 @@ const CreateJob = () => {
       <div className="mx-auto max-w-3xl space-y-6">
         {/* Page Header */}
         <div className="flex items-center gap-4 animate-fade-in">
-          <Link to="/recruitment">
+          <Link to="/hr/recruitment">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -128,7 +128,7 @@ const CreateJob = () => {
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-              <Link to="/recruitment">
+              <Link to="/hr/recruitment">
                 <Button variant="outline">Cancel</Button>
               </Link>
               <Button variant="secondary">Save as Draft</Button>

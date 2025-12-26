@@ -28,34 +28,34 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import hriveLogo from "@/assets/hrive-logo.png";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Dashboard", href: "/hr/dashboard", icon: LayoutDashboard },
   {
     name: "Recruitment",
-    href: "/recruitment",
+    href: "/hr/recruitment",
     icon: Briefcase,
     children: [
-      { name: "ATS", href: "/recruitment", icon: Briefcase },
-      { name: "Interviews", href: "/recruitment/interviews", icon: Video },
-      { name: "Add Candidate", href: "/recruitment/new-candidate", icon: UserPlus },
-      { name: "Pipeline", href: "/recruitment/pipeline", icon: Kanban },
-      { name: "Jobs", href: "/recruitment/offers", icon: FileText },
+      { name: "ATS", href: "/hr/recruitment", icon: Briefcase },
+      { name: "Interviews", href: "/hr/recruitment/interviews", icon: Video },
+      { name: "Add Candidate", href: "/hr/recruitment/new-candidate", icon: UserPlus },
+      { name: "Pipeline", href: "/hr/recruitment/pipeline", icon: Kanban },
+      { name: "Jobs", href: "/hr/recruitment/offers", icon: FileText },
     ],
   },
   {
     name: "Core HR",
-    href: "/core-hr",
+    href: "/hr/core-hr",
     icon: Users,
     children: [
-      { name: "Employees", href: "/core-hr", icon: Users },
-      { name: "Attendance", href: "/attendance", icon: Clock },
-      { name: "Leave", href: "/leave", icon: Calendar },
+      { name: "Employees", href: "/hr/core-hr", icon: Users },
+      { name: "Attendance", href: "/hr/attendance", icon: Clock },
+      { name: "Leave", href: "/hr/leave", icon: Calendar },
     ],
   },
-  { name: "Payroll", href: "/payroll", icon: Wallet },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Cognitive HR", href: "/cognitive-ai", icon: Brain },
-  { name: "AskHR", href: "/ask-hr", icon: MessageSquare },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Payroll", href: "/hr/payroll", icon: Wallet },
+  { name: "Analytics", href: "/hr/analytics", icon: BarChart3 },
+  { name: "Cognitive HR", href: "/hr/cognitive-ai", icon: Brain },
+  { name: "AskHR", href: "/hr/ask-hr", icon: MessageSquare },
+  { name: "Settings", href: "/hr/settings", icon: Settings },
 ];
 
 export function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange }) {
@@ -69,7 +69,7 @@ export function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange }) {
   };
 
   const isItemActive = (href) => {
-    if (href === "/") return location.pathname === "/";
+    if (href === "/hr/dashboard") return location.pathname === "/hr/dashboard";
     return location.pathname === href || location.pathname.startsWith(href + "/");
   };
 
@@ -179,7 +179,7 @@ export function Sidebar({ isOpen, onClose, collapsed, onCollapsedChange }) {
     >
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-        <Link to="/" className="flex items-center gap-3" onClick={onClose}>
+        <Link to="/hr/dashboard" className="flex items-center gap-3" onClick={onClose}>
           <img
             src={hriveLogo}
             alt="HRive"

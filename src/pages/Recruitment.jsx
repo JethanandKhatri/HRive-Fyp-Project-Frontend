@@ -95,7 +95,7 @@ const Recruitment = () => {
             <h1 className="text-2xl font-bold tracking-tight">Recruitment</h1>
             <p className="text-muted-foreground">Manage your hiring pipeline and applicants</p>
           </div>
-          <Link to="/recruitment/new-job">
+          <Link to="/hr/recruitment/new-job">
             <Button className="gap-2 gradient-primary border-0">
               <Plus className="h-4 w-4" />
               Post New Job
@@ -159,7 +159,7 @@ const Recruitment = () => {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Link to={`/recruitment/job/${job.id}/applicants`}>
+                    <Link to={`/hr/recruitment/job/${job.id}/applicants`}>
                       <Button size="sm" variant="secondary" className="gap-1.5">
                         <Eye className="h-3.5 w-3.5" />
                         View

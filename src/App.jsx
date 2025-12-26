@@ -2,8 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 // Main Pages
 import Dashboard from "./pages/Dashboard";
@@ -22,7 +23,6 @@ import NotFound from "./pages/NotFound";
 
 // Auth Pages
 import SignIn from "./pages/auth/SignIn";
-import SeedUsers from "./pages/auth/SeedUsers";
 
 // ATS Pages
 import Pipeline from "./pages/recruitment/Pipeline";
@@ -71,58 +71,369 @@ const App = () => (
         <AuthProvider>
           <Routes>
             {/* Auth Routes */}
-            <Route path="/auth/signin" element={<SignIn />} />
-            <Route path="/auth/seed" element={<SeedUsers />} />
+            <Route path="/auth/login" element={<SignIn />} />
             
+            {/* Auth Landing */}
+            <Route path="/" element={<Navigate to="/auth/login" replace />} />
+
             {/* HR Manager Portal Routes */}
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/core-hr" element={<CoreHR />} />
-            <Route path="/attendance" element={<Attendance />} />
-            <Route path="/leave" element={<Leave />} />
-            <Route path="/payroll" element={<Payroll />} />
-            <Route path="/cognitive-ai" element={<CognitiveAI />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/ask-hr" element={<AskHR />} />
-            <Route path="/settings" element={<Settings />} />
+            {/* Admin Portal Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/organization"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Organization />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/users"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <UserManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/roles"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <RolesPermissions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/modules"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Modules />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/compliance"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Compliance />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/audit-logs"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AuditLogs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminSettings />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Legacy Admin Routes */}
+            <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/admin/organization" element={<Navigate to="/dashboard/organization" replace />} />
+            <Route path="/admin/users" element={<Navigate to="/dashboard/users" replace />} />
+            <Route path="/admin/roles" element={<Navigate to="/dashboard/roles" replace />} />
+            <Route path="/admin/modules" element={<Navigate to="/dashboard/modules" replace />} />
+            <Route path="/admin/compliance" element={<Navigate to="/dashboard/compliance" replace />} />
+            <Route path="/admin/audit-logs" element={<Navigate to="/dashboard/audit-logs" replace />} />
+            <Route path="/admin/settings" element={<Navigate to="/dashboard/settings" replace />} />
+
+            {/* HR Manager Portal Routes */}
+            <Route
+              path="/hr/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/core-hr"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <CoreHR />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/attendance"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Attendance />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/leave"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Leave />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/payroll"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Payroll />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/cognitive-ai"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <CognitiveAI />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/analytics"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Analytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/ask-hr"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <AskHR />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/settings"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Recruitment / ATS Routes */}
-            <Route path="/recruitment" element={<Recruitment />} />
-            <Route path="/recruitment/new-job" element={<CreateJob />} />
-            <Route path="/recruitment/job/:jobId" element={<JobDetail />} />
-            <Route path="/recruitment/job/:jobId/applicants" element={<Applicants />} />
-            <Route path="/recruitment/pipeline" element={<Pipeline />} />
-            <Route path="/recruitment/interviews" element={<Interviews />} />
-            <Route path="/recruitment/offers" element={<Offers />} />
-            <Route path="/recruitment/team" element={<Team />} />
-            
-            {/* Admin Portal Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/organization" element={<Organization />} />
-            <Route path="/admin/users" element={<UserManagement />} />
-            <Route path="/admin/roles" element={<RolesPermissions />} />
-            <Route path="/admin/modules" element={<Modules />} />
-            <Route path="/admin/compliance" element={<Compliance />} />
-            <Route path="/admin/audit-logs" element={<AuditLogs />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route
+              path="/hr/recruitment"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Recruitment />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/new-job"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <CreateJob />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/job/:jobId"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <JobDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/job/:jobId/applicants"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Applicants />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/pipeline"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Pipeline />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/interviews"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Interviews />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/offers"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Offers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/hr/recruitment/team"
+              element={
+                <ProtectedRoute allowedRoles={["hr_manager"]}>
+                  <Team />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Legacy HR Manager Routes */}
+            <Route path="/core-hr" element={<Navigate to="/hr/core-hr" replace />} />
+            <Route path="/attendance" element={<Navigate to="/hr/attendance" replace />} />
+            <Route path="/leave" element={<Navigate to="/hr/leave" replace />} />
+            <Route path="/payroll" element={<Navigate to="/hr/payroll" replace />} />
+            <Route path="/cognitive-ai" element={<Navigate to="/hr/cognitive-ai" replace />} />
+            <Route path="/analytics" element={<Navigate to="/hr/analytics" replace />} />
+            <Route path="/ask-hr" element={<Navigate to="/hr/ask-hr" replace />} />
+            <Route path="/settings" element={<Navigate to="/hr/settings" replace />} />
+            <Route path="/recruitment" element={<Navigate to="/hr/recruitment" replace />} />
+            <Route path="/recruitment/new-job" element={<Navigate to="/hr/recruitment/new-job" replace />} />
+            <Route path="/recruitment/job/:jobId" element={<Navigate to="/hr/recruitment/job/:jobId" replace />} />
+            <Route path="/recruitment/job/:jobId/applicants" element={<Navigate to="/hr/recruitment/job/:jobId/applicants" replace />} />
+            <Route path="/recruitment/pipeline" element={<Navigate to="/hr/recruitment/pipeline" replace />} />
+            <Route path="/recruitment/interviews" element={<Navigate to="/hr/recruitment/interviews" replace />} />
+            <Route path="/recruitment/offers" element={<Navigate to="/hr/recruitment/offers" replace />} />
+            <Route path="/recruitment/team" element={<Navigate to="/hr/recruitment/team" replace />} />
             
             {/* Line Manager Portal Routes */}
-            <Route path="/manager" element={<ManagerDashboard />} />
-            <Route path="/manager/team" element={<MyTeam />} />
-            <Route path="/manager/attendance" element={<TeamAttendance />} />
-            <Route path="/manager/leave" element={<LeaveApprovals />} />
-            <Route path="/manager/interviews" element={<ManagerInterviews />} />
-            <Route path="/manager/insights" element={<TeamInsights />} />
-            <Route path="/manager/ask-hr" element={<ManagerAskHR />} />
-            <Route path="/manager/settings" element={<ManagerSettings />} />
+            <Route
+              path="/manager"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <ManagerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/team"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <MyTeam />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/attendance"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <TeamAttendance />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/leave"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <LeaveApprovals />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/interviews"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <ManagerInterviews />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/insights"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <TeamInsights />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/ask-hr"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <ManagerAskHR />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manager/settings"
+              element={
+                <ProtectedRoute allowedRoles={["line_manager"]}>
+                  <ManagerSettings />
+                </ProtectedRoute>
+              }
+            />
             
             {/* Employee Portal Routes */}
-            <Route path="/employee" element={<EmployeeDashboard />} />
-            <Route path="/employee/attendance" element={<EmployeeAttendance />} />
-            <Route path="/employee/leave" element={<EmployeeLeave />} />
-            <Route path="/employee/payslips" element={<EmployeePayslips />} />
-            <Route path="/employee/announcements" element={<EmployeeAnnouncements />} />
-            <Route path="/employee/ask-hr" element={<EmployeeAskHR />} />
-            <Route path="/employee/settings" element={<EmployeeSettings />} />
+            <Route
+              path="/employee"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeeDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/attendance"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeeAttendance />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/leave"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeeLeave />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/payslips"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeePayslips />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/announcements"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeeAnnouncements />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/ask-hr"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeeAskHR />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/employee/settings"
+              element={
+                <ProtectedRoute allowedRoles={["employee"]}>
+                  <EmployeeSettings />
+                </ProtectedRoute>
+              }
+            />
             
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

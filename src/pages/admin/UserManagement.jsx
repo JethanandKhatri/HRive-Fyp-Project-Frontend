@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,45 +12,235 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, UserPlus, Mail, MoreHorizontal, Edit, Trash2, Key, CheckCircle2 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-const users = [
-  { id: 1, name: "Sarah Ahmed", email: "sarah.ahmed@company.com", role: "HR Manager", department: "Human Resources", status: "Active" },
-  { id: 2, name: "Ali Hassan", email: "ali.hassan@company.com", role: "Line Manager", department: "Engineering", status: "Active" },
-  { id: 3, name: "Fatima Khan", email: "fatima.khan@company.com", role: "Employee", department: "Marketing", status: "Active" },
-  { id: 4, name: "Ahmed Raza", email: "ahmed.raza@company.com", role: "HR Manager", department: "Human Resources", status: "Pending" },
-  { id: 5, name: "Zainab Ali", email: "zainab.ali@company.com", role: "Employee", department: "Finance", status: "Active" },
-  { id: 6, name: "Usman Malik", email: "usman.malik@company.com", role: "Line Manager", department: "Operations", status: "Inactive" },
-];
-
-const departments = ["Human Resources", "Engineering", "Marketing", "Finance", "Operations", "Sales"];
-const roles = ["HR Manager", "Line Manager", "Employee"];
+const roles = ["Admin", "HR Manager", "Line Manager", "Employee"];
 
 export default function UserManagement() {
   const { toast } = useToast();
+  const [users, setUsers] = useState([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [usersError, setUsersError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [tempPassword, setTempPassword] = useState("");
   const [newUser, setNewUser] = useState({
     fullName: "",
     email: "",
     role: "",
-    department: "",
     reportingManager: "",
   });
+  const manageUsersFunction =
+    import.meta.env.VITE_SUPABASE_EDGE_MANAGE_USERS_FUNCTION ||
+    "create-user";
+  const createUserUrl =
+    import.meta.env.VITE_SUPABASE_EDGE_CREATE_USER_URL ||
+    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`;
+  const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredUsers = useMemo(() => {
+    if (!searchQuery) return users;
+    const query = searchQuery.toLowerCase();
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query) ||
+        user.role.toLowerCase().includes(query)
+    );
+  }, [searchQuery, users]);
 
-  const handleCreateUser = () => {
-    toast({
-      title: "User created successfully",
-      description: `Credentials sent to ${newUser.email}. User must reset password on first login.`,
-    });
-    setIsDialogOpen(false);
-    setNewUser({ fullName: "", email: "", role: "", department: "", reportingManager: "" });
+  const normalizeRole = (roleLabel) => {
+    switch (roleLabel) {
+      case "Admin":
+        return "ADMIN";
+      case "HR Manager":
+        return "HR";
+      case "Line Manager":
+        return "MANAGER";
+      case "Employee":
+        return "EMPLOYEE";
+      default:
+        return roleLabel?.toLowerCase?.() || "";
+    }
+  };
+
+  const formatRoleLabel = (roleValue) => {
+    switch (roleValue) {
+      case "ADMIN":
+        return "Admin";
+      case "HR":
+        return "HR Manager";
+      case "MANAGER":
+        return "Line Manager";
+      case "EMPLOYEE":
+        return "Employee";
+      default:
+        return roleValue || "Employee";
+    }
+  };
+
+  const buildDisplayName = (email) => {
+    if (!email) return "Unknown";
+    const base = email.split("@")[0] || email;
+    return base
+      .replace(/[._-]+/g, " ")
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ");
+  };
+
+  const mapApiUser = (user) => ({
+    id: user.id,
+    name: buildDisplayName(user.email),
+    email: user.email,
+    role: formatRoleLabel(user.role),
+    department: user.department || "Unassigned",
+    status: user.is_active ? "Active" : "Inactive",
+  });
+
+  const fetchUsers = async () => {
+    setIsLoadingUsers(true);
+    setUsersError("");
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        manageUsersFunction,
+        { method: "GET" }
+      );
+      if (error) {
+        throw error;
+      }
+      if (data?.success === false) {
+        throw new Error(data?.error || "Failed to fetch users.");
+      }
+      const list = Array.isArray(data?.users) ? data.users : [];
+      setUsers(list.map(mapApiUser));
+    } catch (error) {
+      setUsersError(error?.message || "Unable to load users.");
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleCreateUser = async () => {
+    if (!newUser.fullName || !newUser.email || !newUser.role) {
+      toast({
+        title: "Missing details",
+        description: "Please fill in full name, email, and role.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!createUserUrl || !anonKey) {
+      toast({
+        title: "Configuration error",
+        description: "Missing create-user edge function configuration.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingUser(true);
+    try {
+      const payload = {
+        full_name: newUser.fullName,
+        email: newUser.email,
+        role: normalizeRole(newUser.role),
+        reporting_manager: newUser.reportingManager || null,
+      };
+
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        throw sessionError;
+      }
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        throw new Error("Missing access token. Please sign in again.");
+      }
+
+      const response = await fetch(createUserUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          apikey: anonKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok || data?.success === false) {
+        const message = data?.error || data?.message || "Unable to create user.";
+        toast({
+          title: "Create user failed",
+          description: message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const createdUser = data?.user;
+      setTempPassword(data?.temp_password || "");
+      if (createdUser) {
+        setUsers((prev) => {
+          const exists = prev.some((user) => user.email === createdUser.email);
+          const mappedUser = {
+            ...mapApiUser(createdUser),
+            name: newUser.fullName || buildDisplayName(createdUser.email),
+            department: "Unassigned",
+          };
+          if (exists) {
+            return prev.map((user) =>
+              user.email === createdUser.email ? mappedUser : user
+            );
+          }
+          return [mappedUser, ...prev];
+        });
+      } else {
+        await fetchUsers();
+      }
+
+      toast({
+        title: "User created successfully",
+        description: data?.temp_password
+          ? `Temp password: ${data.temp_password}`
+          : `User created for ${newUser.email}.`,
+      });
+      setNewUser({ fullName: "", email: "", role: "", reportingManager: "" });
+    } catch (error) {
+      toast({
+        title: "Create user failed",
+        description: error?.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingUser(false);
+    }
+  };
+
+  const handleCopyTempPassword = async () => {
+    if (!tempPassword) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(tempPassword);
+      toast({
+        title: "Copied",
+        description: "Temporary password copied to clipboard.",
+      });
+    } catch (error) {
+      toast({
+        title: "Copy failed",
+        description: error?.message || "Unable to copy password.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -64,6 +254,7 @@ export default function UserManagement() {
 
   const getRoleBadge = (role) => {
     const styles = {
+      Admin: "bg-destructive/10 text-destructive border-destructive/20",
       "HR Manager": "bg-primary/10 text-primary border-primary/20",
       "Line Manager": "bg-info/10 text-info border-info/20",
       Employee: "bg-muted text-foreground border-border",
@@ -81,7 +272,15 @@ export default function UserManagement() {
             <p className="text-muted-foreground mt-1">Create and manage system users</p>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) {
+                setTempPassword("");
+              }
+            }}
+          >
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <UserPlus className="h-4 w-4" />
@@ -137,20 +336,15 @@ export default function UserManagement() {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="department" className="text-foreground">Department</Label>
-                    <Select
-                      value={newUser.department}
-                      onValueChange={(value) => setNewUser({ ...newUser, department: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select dept" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((dept) => (
-                          <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="tempPassword" className="text-foreground">Temporary Password</Label>
+                    <Input
+                      id="tempPassword"
+                      placeholder="Generated after create"
+                      value={tempPassword}
+                      readOnly
+                      onClick={handleCopyTempPassword}
+                      className="cursor-pointer"
+                    />
                   </div>
                 </div>
 
@@ -192,7 +386,10 @@ export default function UserManagement() {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleCreateUser} disabled={!newUser.fullName || !newUser.email || !newUser.role}>
+                <Button
+                  onClick={handleCreateUser}
+                  disabled={!newUser.fullName || !newUser.email || !newUser.role || isCreatingUser}
+                >
                   Create & Send Invite
                 </Button>
               </DialogFooter>
@@ -216,7 +413,7 @@ export default function UserManagement() {
           </Card>
           <Card className="border-border/50">
             <CardContent className="p-4">
-              <p className="text-2xl font-bold text-warning">{users.filter(u => u.status === "Pending").length}</p>
+              <p className="text-2xl font-bold text-warning">0</p>
               <p className="text-sm text-muted-foreground">Pending</p>
             </CardContent>
           </Card>
@@ -248,6 +445,16 @@ export default function UserManagement() {
             </div>
           </CardHeader>
           <CardContent>
+            {usersError && (
+              <div className="mb-4 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-sm text-destructive">
+                {usersError}
+              </div>
+            )}
+            {isLoadingUsers ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                Loading users...
+              </div>
+            ) : null}
             {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <Table>

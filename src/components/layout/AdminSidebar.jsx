@@ -19,21 +19,21 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import hriveLogo from "@/assets/hrive-logo.png";
 
 const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Organization", href: "/admin/organization", icon: Building2 },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Roles & Permissions", href: "/admin/roles", icon: Shield },
-  { name: "Modules", href: "/admin/modules", icon: Boxes },
-  { name: "Compliance", href: "/admin/compliance", icon: Scale },
-  { name: "Audit Logs", href: "/admin/audit-logs", icon: ClipboardList },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Organization", href: "/dashboard/organization", icon: Building2 },
+  { name: "Users", href: "/dashboard/users", icon: Users },
+  { name: "Roles & Permissions", href: "/dashboard/roles", icon: Shield },
+  { name: "Modules", href: "/dashboard/modules", icon: Boxes },
+  { name: "Compliance", href: "/dashboard/compliance", icon: Scale },
+  { name: "Audit Logs", href: "/dashboard/audit-logs", icon: ClipboardList },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function AdminSidebar({ isOpen, onClose, collapsed, onCollapsedChange }) {
   const location = useLocation();
 
   const isItemActive = (href) => {
-    if (href === "/admin") return location.pathname === "/admin";
+    if (href === "/dashboard") return location.pathname === "/dashboard";
     return location.pathname === href || location.pathname.startsWith(href + "/");
   };
 
@@ -83,7 +83,7 @@ export function AdminSidebar({ isOpen, onClose, collapsed, onCollapsedChange }) 
     >
       {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-        <Link to="/admin" className="flex items-center gap-3" onClick={onClose}>
+        <Link to="/dashboard" className="flex items-center gap-3" onClick={onClose}>
           <img
             src={hriveLogo}
             alt="HRive"

@@ -78,7 +78,7 @@ export function LeaveRequests() {
           </div>
         ))}
 
-        <Link to="/leave">
+        <Link to="/hr/leave">
           <Button variant="ghost" className="w-full mt-2 text-primary hover:text-primary hover:bg-primary/10 font-medium">
             View All Requests
             <ArrowRight className="ml-2 h-4 w-4" />

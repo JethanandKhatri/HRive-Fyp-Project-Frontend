@@ -85,7 +85,7 @@ const Applicants = () => {
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center gap-4 animate-fade-in">
-          <Link to="/recruitment">
+          <Link to="/hr/recruitment">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>

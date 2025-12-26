@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { HRiveLogo } from "@/components/HRiveLogo";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getRedirectPath, normalizeRoleValue, resolveUserRole } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 export default function SignIn() {
@@ -15,55 +16,24 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const FALLBACK_EDGE_LOGIN_URL = "https://ruewgiljaznyllyqmrep.supabase.co/functions/v1/login";
+  const FALLBACK_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZXdnaWxqYXpueWxseXFtcmVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNjM0MTEsImV4cCI6MjA3OTgzOTQxMX0.SOKHqCWq4Ml9mOaxrkw4yOfmRMLzAfViiAAxOErbajQ";
+  const edgeLoginUrl =
+    import.meta.env.VITE_SUPABASE_EDGE_LOGIN_URL || FALLBACK_EDGE_LOGIN_URL;
+  const anonKey =
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_ANON_KEY;
   // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        redirectBasedOnRole(session.user.id);
+        const resolvedRole = resolveUserRole(session.user);
+        const redirectPath = getRedirectPath(resolvedRole);
+        navigate(redirectPath, { replace: true });
       }
     };
     checkSession();
   }, []);
-
-  const getRedirectPath = (role) => {
-    switch (role) {
-      case "admin":
-        return "/admin";
-      case "hr_manager":
-        return "/";
-      case "line_manager":
-        return "/manager";
-      case "employee":
-        return "/employee";
-      default:
-        return "/";
-    }
-  };
-
-  const redirectBasedOnRole = async (userId) => {
-    try {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching role:", error);
-        // Default to HR Manager if no role found
-        navigate("/", { replace: true });
-        return;
-      }
-
-      const path = getRedirectPath(data?.role);
-      navigate(path, { replace: true });
-    } catch (err) {
-      console.error("Error in redirect:", err);
-      navigate("/", { replace: true });
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -80,31 +50,92 @@ export default function SignIn() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      if (!edgeLoginUrl || !anonKey) {
+        throw new Error("Missing Supabase edge login configuration.");
+      }
+
+      const response = await fetch(edgeLoginUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${anonKey}`,
+          apikey: anonKey,
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (error) {
+      let payload = null;
+      try {
+        payload = await response.json();
+      } catch {
+        payload = null;
+      }
+
+      if (!response.ok) {
+        const message = payload?.error || payload?.message || "Invalid credentials.";
         toast({
           title: "Sign in failed",
-          description: error.message,
+          description: message,
           variant: "destructive",
         });
         return;
       }
 
-      if (data.user) {
+      const payloadData = payload?.data ?? payload;
+      let session = payloadData?.session ?? payload?.session;
+      if (!session && payloadData?.access_token && payloadData?.refresh_token) {
+        session = {
+          access_token: payloadData.access_token,
+          refresh_token: payloadData.refresh_token,
+        };
+      }
+
+      let user = payloadData?.user ?? payload?.user ?? null;
+      const roleFromPayload =
+        payloadData?.role ||
+        payload?.role ||
+        payloadData?.user?.role ||
+        payload?.user?.role ||
+        payloadData?.user?.user_metadata?.role ||
+        payloadData?.user?.app_metadata?.role;
+      if (session) {
+        const { data, error } = await supabase.auth.setSession(session);
+        if (error) {
+          throw error;
+        }
+        user = data?.session?.user ?? user;
+      }
+
+      if (!user) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        user = sessionData?.session?.user ?? null;
+      }
+
+      if (user) {
+        const normalizedRole = normalizeRoleValue(roleFromPayload);
+        if (normalizedRole) {
+          localStorage.setItem("hrive_role", normalizedRole);
+          localStorage.setItem("hrive_role_user_id", user.id);
+        }
+        const resolvedRole = resolveUserRole(user) || normalizedRole;
+        const redirectPath = getRedirectPath(resolvedRole);
         toast({
           title: "Welcome back!",
           description: "Redirecting to your portal...",
         });
-        await redirectBasedOnRole(data.user.id);
+        navigate(redirectPath, { replace: true });
+        return;
       }
+
+      toast({
+        title: "Sign in failed",
+        description: "Login succeeded but no user session was returned.",
+        variant: "destructive",
+      });
     } catch (err) {
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: err?.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -227,6 +258,7 @@ export default function SignIn() {
     </div>
   );
 }
+
 
 
 
