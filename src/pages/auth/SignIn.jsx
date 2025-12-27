@@ -16,12 +16,12 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const FALLBACK_EDGE_LOGIN_URL = "https://ruewgiljaznyllyqmrep.supabase.co/functions/v1/login";
-  const FALLBACK_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ1ZXdnaWxqYXpueWxseXFtcmVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQyNjM0MTEsImV4cCI6MjA3OTgzOTQxMX0.SOKHqCWq4Ml9mOaxrkw4yOfmRMLzAfViiAAxOErbajQ";
   const edgeLoginUrl =
-    import.meta.env.VITE_SUPABASE_EDGE_LOGIN_URL || FALLBACK_EDGE_LOGIN_URL;
-  const anonKey =
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_ANON_KEY;
+    import.meta.env.VITE_SUPABASE_EDGE_LOGIN_URL ||
+    (import.meta.env.VITE_SUPABASE_URL
+      ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/login`
+      : null);
+  const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
   // Check if already logged in
   useEffect(() => {
     const checkSession = async () => {
@@ -51,7 +51,7 @@ export default function SignIn() {
 
     try {
       if (!edgeLoginUrl || !anonKey) {
-        throw new Error("Missing Supabase edge login configuration.");
+        throw new Error("Missing Supabase auth configuration.");
       }
 
       const response = await fetch(edgeLoginUrl, {
@@ -97,7 +97,10 @@ export default function SignIn() {
         payloadData?.user?.role ||
         payload?.user?.role ||
         payloadData?.user?.user_metadata?.role ||
-        payloadData?.user?.app_metadata?.role;
+        payloadData?.user?.app_metadata?.role ||
+        user?.user_metadata?.role ||
+        user?.app_metadata?.role ||
+        user?.role;
       if (session) {
         const { data, error } = await supabase.auth.setSession(session);
         if (error) {
