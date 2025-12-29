@@ -51,6 +51,16 @@ This project is built with:
 
 Build the app and deploy the `dist` folder to your hosting provider.
 
+## Environment variables
+
+This app requires Supabase env vars at build time. Do not commit `.env`.
+
+Required:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+
+For Netlify, set these in Site settings -> Build & deploy -> Environment, then redeploy.
+
 Employee
 no@gmail.com
 bafcd681dbff
