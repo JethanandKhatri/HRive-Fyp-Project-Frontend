@@ -23,20 +23,48 @@ export default function UserManagement() {
   const [usersError, setUsersError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEmployeeDialogOpen, setIsEmployeeDialogOpen] = useState(false);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [isCreatingEmployee, setIsCreatingEmployee] = useState(false);
   const [tempPassword, setTempPassword] = useState("");
+  const [employeeEmails, setEmployeeEmails] = useState(new Set());
+  const [departments, setDepartments] = useState([]);
+  const [departmentsError, setDepartmentsError] = useState("");
+  const [isLoadingDepartments, setIsLoadingDepartments] = useState(false);
   const [newUser, setNewUser] = useState({
     fullName: "",
     email: "",
     role: "",
     reportingManager: "",
+    department: "",
+  });
+  const [newEmployee, setNewEmployee] = useState({
+    fullName: "",
+    email: "",
+    department: "",
+    designation: "",
+    phone: "",
+    joinDate: "",
   });
   const manageUsersFunction =
     import.meta.env.VITE_SUPABASE_EDGE_MANAGE_USERS_FUNCTION ||
     "create-user";
+  const supabaseBaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const createUserUrl =
     import.meta.env.VITE_SUPABASE_EDGE_CREATE_USER_URL ||
-    `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`;
+    (supabaseBaseUrl
+      ? `${supabaseBaseUrl}/functions/v1/create-user`
+      : "https://ruewgiljaznyllyqmrep.supabase.co/functions/v1/create-user");
+  const departmentsUrl =
+    import.meta.env.VITE_SUPABASE_EDGE_DEPARTMENTS_URL ||
+    (supabaseBaseUrl
+      ? `${supabaseBaseUrl}/functions/v1/departments`
+      : "https://ruewgiljaznyllyqmrep.supabase.co/functions/v1/departments");
+  const createEmployeeUrl =
+    import.meta.env.VITE_SUPABASE_EDGE_CREATE_EMPLOYEE_URL ||
+    (supabaseBaseUrl
+      ? `${supabaseBaseUrl}/functions/v1/create-employee`
+      : "https://ruewgiljaznyllyqmrep.supabase.co/functions/v1/create-employee");
   const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
   const filteredUsers = useMemo(() => {
@@ -49,6 +77,12 @@ export default function UserManagement() {
         user.role.toLowerCase().includes(query)
     );
   }, [searchQuery, users]);
+
+  const availableEmployeeUsers = useMemo(() => {
+    return users.filter(
+      (user) => !employeeEmails.has(user.email?.toLowerCase())
+    );
+  }, [employeeEmails, users]);
 
   const normalizeRole = (roleLabel) => {
     switch (roleLabel) {
@@ -127,6 +161,50 @@ export default function UserManagement() {
     fetchUsers();
   }, []);
 
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      setDepartmentsError("");
+      if (!departmentsUrl || !anonKey) {
+        setDepartmentsError("Missing departments edge function configuration.");
+        return;
+      }
+      setIsLoadingDepartments(true);
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          throw sessionError;
+        }
+        const accessToken = sessionData?.session?.access_token;
+        if (!accessToken) {
+          throw new Error("Missing access token. Please sign in again.");
+        }
+
+        const response = await fetch(departmentsUrl, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            apikey: anonKey,
+          },
+        });
+        const data = await response.json();
+        if (!response.ok || data?.success === false) {
+          throw new Error(data?.error || data?.message || "Unable to load departments.");
+        }
+        const list = Array.isArray(data?.departments) ? data.departments : data || [];
+        const normalized = list
+          .map((item) => (typeof item === "string" ? item : item?.name))
+          .filter(Boolean);
+        setDepartments(normalized);
+      } catch (error) {
+        setDepartmentsError(error?.message || "Unable to load departments.");
+      } finally {
+        setIsLoadingDepartments(false);
+      }
+    };
+
+    fetchDepartments();
+  }, [departmentsUrl, anonKey]);
+
   const handleCreateUser = async () => {
     if (!newUser.fullName || !newUser.email || !newUser.role) {
       toast({
@@ -137,10 +215,23 @@ export default function UserManagement() {
       return;
     }
 
+    const normalizedEmail = newUser.email.trim().toLowerCase();
+    const existingUser = users.find(
+      (user) => user.email?.toLowerCase() === normalizedEmail
+    );
+    if (existingUser) {
+      toast({
+        title: "User already exists",
+        description: `${existingUser.email} is already in the system.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!createUserUrl || !anonKey) {
       toast({
         title: "Configuration error",
-        description: "Missing create-user edge function configuration.",
+        description: "Missing create-employee edge function configuration.",
         variant: "destructive",
       });
       return;
@@ -149,10 +240,11 @@ export default function UserManagement() {
     setIsCreatingUser(true);
     try {
       const payload = {
-        full_name: newUser.fullName,
-        email: newUser.email,
+        full_name: newUser.fullName.trim(),
+        email: normalizedEmail,
         role: normalizeRole(newUser.role),
         reporting_manager: newUser.reportingManager || null,
+        department: newUser.department || null,
       };
 
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -177,10 +269,12 @@ export default function UserManagement() {
       const data = await response.json();
       if (!response.ok || data?.success === false) {
         const message = data?.error || data?.message || "Unable to create user.";
+        const alreadyExists =
+          typeof message === "string" && message.toLowerCase().includes("exist");
         toast({
           title: "Create user failed",
           description: message,
-          variant: "destructive",
+          variant: alreadyExists ? "default" : "destructive",
         });
         return;
       }
@@ -212,7 +306,13 @@ export default function UserManagement() {
           ? `Temp password: ${data.temp_password}`
           : `User created for ${newUser.email}.`,
       });
-      setNewUser({ fullName: "", email: "", role: "", reportingManager: "" });
+      setNewUser({
+        fullName: "",
+        email: "",
+        role: "",
+        reportingManager: "",
+        department: "",
+      });
     } catch (error) {
       toast({
         title: "Create user failed",
@@ -221,6 +321,110 @@ export default function UserManagement() {
       });
     } finally {
       setIsCreatingUser(false);
+    }
+  };
+
+  const handleCreateEmployee = async () => {
+    if (!newEmployee.fullName || !newEmployee.email) {
+      toast({
+        title: "Missing details",
+        description: "Please fill in full name and email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const normalizedEmail = newEmployee.email.trim().toLowerCase();
+    const existingUser = users.find(
+      (user) => user.email?.toLowerCase() === normalizedEmail
+    );
+    if (!existingUser) {
+      toast({
+        title: "User not found",
+        description: "Create the user first, then add them as an employee.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!createEmployeeUrl || !anonKey) {
+      toast({
+        title: "Configuration error",
+        description: "Missing create-employee edge function configuration.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsCreatingEmployee(true);
+    try {
+      const payload = {
+        full_name: newEmployee.fullName.trim(),
+        email: normalizedEmail,
+        department: newEmployee.department?.trim() || null,
+        designation: newEmployee.designation?.trim() || null,
+        phone: newEmployee.phone?.trim() || null,
+        join_date: newEmployee.joinDate || null,
+      };
+
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        throw sessionError;
+      }
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        throw new Error("Missing access token. Please sign in again.");
+      }
+
+      const response = await fetch(createEmployeeUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          apikey: anonKey,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (!response.ok || data?.success === false) {
+        const message = data?.error || data?.message || "Unable to create employee.";
+        const alreadyExists =
+          typeof message === "string" && message.toLowerCase().includes("exist");
+        toast({
+          title: "Create employee failed",
+          description: message,
+          variant: alreadyExists ? "default" : "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Employee created",
+        description: `${newEmployee.fullName} is now an employee.`,
+      });
+      setEmployeeEmails((prev) => {
+        const next = new Set(prev);
+        next.add(normalizedEmail);
+        return next;
+      });
+      setNewEmployee({
+        fullName: "",
+        email: "",
+        department: "",
+        designation: "",
+        phone: "",
+        joinDate: "",
+      });
+      setIsEmployeeDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Create employee failed",
+        description: error?.message || "An unexpected error occurred.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingEmployee(false);
     }
   };
 
@@ -272,65 +476,66 @@ export default function UserManagement() {
             <p className="text-muted-foreground mt-1">Create and manage system users</p>
           </div>
           
-          <Dialog
-            open={isDialogOpen}
-            onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              if (!open) {
-                setTempPassword("");
-              }
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <UserPlus className="h-4 w-4" />
-                Create User
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
-                <DialogDescription>
-                  Add a new user to the system. They will receive credentials via email.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    placeholder="Enter full name"
-                    value={newUser.fullName}
-                    onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
-                  />
-                </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Dialog
+              open={isDialogOpen}
+              onOpenChange={(open) => {
+                setIsDialogOpen(open);
+                if (!open) {
+                  setTempPassword("");
+                }
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button className="gap-2">
+                  <UserPlus className="h-4 w-4" />
+                  Create User
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                  <DialogTitle>Create New User</DialogTitle>
+                  <DialogDescription>
+                    Add a new user to the system. They will receive credentials via email.
+                  </DialogDescription>
+                </DialogHeader>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Official Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="user@company.com"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="role" className="text-foreground">Role</Label>
-                    <Select
-                      value={newUser.role}
-                      onValueChange={(value) => setNewUser({ ...newUser, role: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roles.map((role) => (
-                          <SelectItem key={role} value={role}>{role}</SelectItem>
-                        ))}
+                    <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      placeholder="Enter full name"
+                      value={newUser.fullName}
+                      onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-foreground">Official Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="user@company.com"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="role" className="text-foreground">Role</Label>
+                      <Select
+                        value={newUser.role}
+                        onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {roles.map((role) => (
+                            <SelectItem key={role} value={role}>{role}</SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -338,63 +543,205 @@ export default function UserManagement() {
                   <div className="space-y-2">
                     <Label htmlFor="tempPassword" className="text-foreground">Temporary Password</Label>
                     <Input
-                      id="tempPassword"
-                      placeholder="Generated after create"
-                      value={tempPassword}
-                      readOnly
-                      onClick={handleCopyTempPassword}
+                        id="tempPassword"
+                        placeholder="Generated after create"
+                        value={tempPassword}
+                        readOnly
+                        onClick={handleCopyTempPassword}
                       className="cursor-pointer"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="userDepartment" className="text-foreground">Department</Label>
+                  <Select
+                    value={newUser.department}
+                    onValueChange={(value) => setNewUser({ ...newUser, department: value })}
+                    disabled={isLoadingDepartments || departments.length === 0}
+                  >
+                    <SelectTrigger id="userDepartment">
+                      <SelectValue placeholder={isLoadingDepartments ? "Loading departments..." : "Select department"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((department) => (
+                        <SelectItem key={department} value={department}>
+                          {department}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {departmentsError ? (
+                    <p className="text-xs text-destructive">{departmentsError}</p>
+                  ) : null}
                 </div>
 
                 {(newUser.role === "Employee" || newUser.role === "Line Manager") && (
                   <div className="space-y-2">
                     <Label htmlFor="manager" className="text-foreground">Reporting Manager</Label>
                     <Select
-                      value={newUser.reportingManager}
-                      onValueChange={(value) => setNewUser({ ...newUser, reportingManager: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select manager" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {users.filter(u => u.role !== "Employee").map((user) => (
-                          <SelectItem key={user.id} value={user.name}>{user.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                        value={newUser.reportingManager}
+                        onValueChange={(value) => setNewUser({ ...newUser, reportingManager: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select manager" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {users.filter(u => u.role !== "Employee").map((user) => (
+                            <SelectItem key={user.id} value={user.name}>{user.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
-                {/* Info Box */}
-                <div className="p-3 rounded-lg bg-info/5 border border-info/20">
-                  <div className="flex items-start gap-2">
-                    <Mail className="h-4 w-4 text-info mt-0.5" />
-                    <div className="text-sm">
-                      <p className="font-medium text-foreground">Auto-generated credentials</p>
-                      <p className="text-muted-foreground">
-                        A temporary password will be generated and sent to the user's email. 
-                        They will be required to reset it on first login.
-                      </p>
+                  {/* Info Box */}
+                  <div className="p-3 rounded-lg bg-info/5 border border-info/20">
+                    <div className="flex items-start gap-2">
+                      <Mail className="h-4 w-4 text-info mt-0.5" />
+                      <div className="text-sm">
+                        <p className="font-medium text-foreground">Auto-generated credentials</p>
+                        <p className="text-muted-foreground">
+                          A temporary password will be generated and sent to the user's email. 
+                          They will be required to reset it on first login.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Cancel
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateUser}
+                    disabled={!newUser.fullName || !newUser.email || !newUser.role || isCreatingUser}
+                  >
+                    Create & Send Invite
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog
+              open={isEmployeeDialogOpen}
+              onOpenChange={(open) => setIsEmployeeDialogOpen(open)}
+            >
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Create Employee
                 </Button>
-                <Button
-                  onClick={handleCreateUser}
-                  disabled={!newUser.fullName || !newUser.email || !newUser.role || isCreatingUser}
-                >
-                  Create & Send Invite
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[520px]">
+                <DialogHeader>
+                  <DialogTitle>Create Employee</DialogTitle>
+                  <DialogDescription>
+                    Convert an existing user into an employee profile.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="employeeFullName" className="text-foreground">Full Name</Label>
+                    <Input
+                      id="employeeFullName"
+                      placeholder="Enter full name"
+                      value={newEmployee.fullName}
+                      onChange={(e) => setNewEmployee({ ...newEmployee, fullName: e.target.value })}
+                    />
+                  </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="employeeEmail" className="text-foreground">User Email</Label>
+                  <Select
+                    value={newEmployee.email}
+                    onValueChange={(value) => {
+                      setNewEmployee({
+                        ...newEmployee,
+                        email: value,
+                        fullName: newEmployee.fullName || buildDisplayName(value),
+                      });
+                    }}
+                  >
+                    <SelectTrigger id="employeeEmail">
+                      <SelectValue placeholder="Select user email" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableEmployeeUsers.map((user) => (
+                        <SelectItem key={user.id} value={user.email}>
+                          {user.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {usersError ? (
+                    <p className="text-xs text-destructive">{usersError}</p>
+                  ) : null}
+                    <p className="text-xs text-muted-foreground">
+                      User must already exist (created by Admin).
+                    </p>
+                </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="employeeDepartment" className="text-foreground">Department</Label>
+                      <Input
+                        id="employeeDepartment"
+                        placeholder="e.g. Engineering"
+                        value={newEmployee.department}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, department: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="employeeDesignation" className="text-foreground">Designation</Label>
+                      <Input
+                        id="employeeDesignation"
+                        placeholder="e.g. Software Engineer"
+                        value={newEmployee.designation}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, designation: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="employeePhone" className="text-foreground">Phone</Label>
+                      <Input
+                        id="employeePhone"
+                        type="tel"
+                        placeholder="+92 300 1234567"
+                        value={newEmployee.phone}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, phone: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="employeeJoinDate" className="text-foreground">Join Date</Label>
+                      <Input
+                        id="employeeJoinDate"
+                        type="date"
+                        value={newEmployee.joinDate}
+                        onChange={(e) => setNewEmployee({ ...newEmployee, joinDate: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsEmployeeDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateEmployee}
+                    disabled={!newEmployee.fullName || !newEmployee.email || isCreatingEmployee}
+                  >
+                    Create Employee
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         {/* Stats Cards */}

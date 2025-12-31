@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogIn, LogOut, Clock } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { checkInAttendance, checkOutAttendance, fetchAttendanceRecords } from "@/lib/attendanceApi";
 
 export function AttendanceCheckIn() {
   const { user } = useAuth();
@@ -32,17 +32,11 @@ export function AttendanceCheckIn() {
     if (!user) return;
 
     const today = format(new Date(), "yyyy-MM-dd");
-    const { data, error } = await supabase
-      .from("attendance_records")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("date", today)
-      .maybeSingle();
-
-    if (error) {
+    try {
+      const records = await fetchAttendanceRecords({ date: today, user_id: user.id });
+      setTodayRecord(records[0] || null);
+    } catch (error) {
       console.error("Error fetching attendance:", error);
-    } else {
-      setTodayRecord(data);
     }
   };
 
@@ -53,33 +47,13 @@ export function AttendanceCheckIn() {
     try {
       const now = new Date();
       const today = format(now, "yyyy-MM-dd");
-      const checkInTime = now.toISOString();
-
-      // Determine status based on check-in time (9 AM is on-time cutoff)
-      const hour = now.getHours();
-      const status = hour >= 9 && now.getMinutes() > 15 ? "late" : "present";
-
-      const { data, error } = await supabase
-        .from("attendance_records")
-        .insert({
-          user_id: user.id,
-          date: today,
-          check_in_time: checkInTime,
-          status: status,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        if (error.code === "23505") {
-          toast.error("You have already checked in today");
-        } else {
-          throw error;
-        }
-      } else {
-        setTodayRecord(data);
-        toast.success(`Checked in at ${format(now, "hh:mm a")}`);
+      const record = await checkInAttendance(today);
+      if (!record) {
+        toast.error("Unable to check in. Please try again.");
+        return;
       }
+      setTodayRecord(record);
+      toast.success(`Checked in at ${format(now, "hh:mm a")}`);
     } catch (error) {
       console.error("Check-in error:", error);
       toast.error("Failed to check in. Please try again.");
@@ -94,18 +68,12 @@ export function AttendanceCheckIn() {
 
     try {
       const now = new Date();
-      const checkOutTime = now.toISOString();
-
-      const { data, error } = await supabase
-        .from("attendance_records")
-        .update({ check_out_time: checkOutTime })
-        .eq("id", todayRecord.id)
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setTodayRecord(data);
+      const record = await checkOutAttendance(format(new Date(), "yyyy-MM-dd"));
+      if (!record) {
+        toast.error("Unable to check out. Please try again.");
+        return;
+      }
+      setTodayRecord(record);
       toast.success(`Checked out at ${format(now, "hh:mm a")}`);
     } catch (error) {
       console.error("Check-out error:", error);
@@ -115,15 +83,15 @@ export function AttendanceCheckIn() {
     }
   };
 
-  const isCheckedIn = todayRecord?.check_in_time && !todayRecord?.check_out_time;
-  const isCheckedOut = todayRecord?.check_in_time && todayRecord?.check_out_time;
+  const isCheckedIn = todayRecord?.checkInTime && !todayRecord?.checkOutTime;
+  const isCheckedOut = todayRecord?.checkInTime && todayRecord?.checkOutTime;
 
   const getStatusText = () => {
     if (isCheckedOut) {
       return `Completed for today`;
     }
-    if (isCheckedIn && todayRecord?.check_in_time) {
-      return `Checked in at ${format(new Date(todayRecord.check_in_time), "hh:mm a")}`;
+    if (isCheckedIn && todayRecord?.checkInTime) {
+      return `Checked in at ${format(new Date(todayRecord.checkInTime), "hh:mm a")}`;
     }
     return "Not checked in yet";
   };
@@ -187,12 +155,12 @@ export function AttendanceCheckIn() {
           <p className="text-sm text-muted-foreground">{getStatusText()}</p>
 
           {/* Show check-out time if completed */}
-          {isCheckedOut && todayRecord?.check_out_time && (
+          {isCheckedOut && todayRecord?.checkOutTime && (
             <div className="w-full pt-3 border-t border-border">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Check Out</span>
                 <span className="font-medium text-foreground">
-                  {format(new Date(todayRecord.check_out_time), "hh:mm a")}
+                  {format(new Date(todayRecord.checkOutTime), "hh:mm a")}
                 </span>
               </div>
             </div>

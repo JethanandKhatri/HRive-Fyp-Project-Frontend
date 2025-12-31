@@ -35,6 +35,8 @@ import Team from "./pages/recruitment/Team";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Organization from "./pages/admin/Organization";
 import UserManagement from "./pages/admin/UserManagement";
+import Departments from "./pages/admin/Departments";
+import AdminAttendance from "./pages/admin/AdminAttendance";
 import RolesPermissions from "./pages/admin/RolesPermissions";
 import Modules from "./pages/admin/Modules";
 import Compliance from "./pages/admin/Compliance";
@@ -103,10 +105,26 @@ const App = () => (
               }
             />
             <Route
+              path="/dashboard/departments"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <Departments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard/roles"
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <RolesPermissions />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/attendance"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminAttendance />
                 </ProtectedRoute>
               }
             />
@@ -147,6 +165,8 @@ const App = () => (
             <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
             <Route path="/admin/organization" element={<Navigate to="/dashboard/organization" replace />} />
             <Route path="/admin/users" element={<Navigate to="/dashboard/users" replace />} />
+            <Route path="/admin/departments" element={<Navigate to="/dashboard/departments" replace />} />
+            <Route path="/admin/attendance" element={<Navigate to="/dashboard/attendance" replace />} />
             <Route path="/admin/roles" element={<Navigate to="/dashboard/roles" replace />} />
             <Route path="/admin/modules" element={<Navigate to="/dashboard/modules" replace />} />
             <Route path="/admin/compliance" element={<Navigate to="/dashboard/compliance" replace />} />
@@ -445,6 +465,4 @@ const App = () => (
 );
 
 export default App;
-
-
 

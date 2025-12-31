@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { MainLayout } from "@/components/layout/MainLayout";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,12 +19,10 @@ import {
   UserCheck,
   UserX,
   UserMinus,
-  Calendar,
   Search,
   Download,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AttendanceCheckIn } from "@/components/attendance/AttendanceCheckIn";
 import { fetchAttendanceRecords } from "@/lib/attendanceApi";
 import { format } from "date-fns";
 
@@ -35,7 +33,7 @@ const statusStyles = {
   "half-day": "bg-info/10 text-info",
 };
 
-const Attendance = () => {
+export default function AdminAttendance() {
   const [todayRecords, setTodayRecords] = useState([]);
   const [monthRecords, setMonthRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -142,25 +140,19 @@ const Attendance = () => {
   }, [selectedMonth]);
 
   return (
-    <MainLayout>
+    <AdminLayout>
       <div className="space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Attendance</h1>
-            <p className="text-muted-foreground">Track and manage employee attendance</p>
+            <h1 className="text-2xl font-semibold text-foreground">Attendance</h1>
+            <p className="text-muted-foreground mt-1">Company-wide attendance overview</p>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Export
-            </Button>
-          </div>
+          <Button variant="outline" className="gap-2">
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
         </div>
 
-        <AttendanceCheckIn />
-
-        {/* KPI Cards */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard title="Present Today" value={String(stats.present)} icon={UserCheck} variant="success" />
           <StatCard title="Absent" value={String(stats.absent)} icon={UserX} variant="danger" />
@@ -168,10 +160,9 @@ const Attendance = () => {
           <StatCard title="Avg. Work Hours" value={stats.avgHours} icon={Clock} />
         </div>
 
-        {/* Attendance Rate Card */}
-        <Card className="shadow-md animate-slide-up">
+        <Card className="shadow-md">
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Monthly Attendance Overview</CardTitle>
+            <CardTitle className="text-lg">Attendance Overview</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-6 md:grid-cols-3">
@@ -202,8 +193,7 @@ const Attendance = () => {
           </CardContent>
         </Card>
 
-        {/* Tabs */}
-        <Tabs defaultValue="today" className="animate-slide-up" style={{ animationDelay: "100ms" }}>
+        <Tabs defaultValue="today">
           <TabsList>
             <TabsTrigger value="today">Today</TabsTrigger>
             <TabsTrigger value="monthly">Monthly</TabsTrigger>
@@ -356,8 +346,6 @@ const Attendance = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </MainLayout>
+    </AdminLayout>
   );
-};
-
-export default Attendance;
+}
